@@ -4,42 +4,42 @@
 #include <vector>
 #include <iostream>
 
-enum InsrtType
+enum InstrType
 {
-    Undefined;
-    RType;
-    IType;
-    SType;
-    BType;  
-    UType;
-    JType;
+    Undefined,
+    RType,
+    IType,
+    SType,
+    BType,  
+    UType,
+    JType
 };
 
 class Instruction
 {
-private:
-    char oppcode;
-    char rd;
-    char func3;
-    char rs1;
-    char rs2;
-    char funct7;
-    int imm;
-    InstrType type;
 public:
+    uint8_t oppcode;
+    uint8_t rd;
+    uint8_t funct3;
+    uint8_t rs1;
+    uint8_t rs2;
+    uint8_t funct7;
+    uint32_t imm;
+    InstrType type;
     Instruction ()
     {
         oppcode = 0;
         rd      = 0;
-        func3   = 0;
+        funct3   = 0;
         rs1     = 0;
         rs2     = 0;
-        func7   = 0;
+        funct7   = 0;
         imm     = 0;
         type = Undefined;
     }
-    void Decode (int raw_instr);
-    ~Instruction ();
+    void Decode (uint32_t raw_instr);
+
+    //~Instruction ();
 };
 
 #endif
