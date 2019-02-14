@@ -1,0 +1,4 @@
+int recursion() 
+{
+	return recursion();
+}

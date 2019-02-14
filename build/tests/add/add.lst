@@ -1,0 +1,34 @@
+
+/home/albert/Proga/risc-V/R5-fsim/build/tests/add/add.elf:     file format elf32-littleriscv
+
+
+Disassembly of section .text:
+
+00010074 <main>:
+   10074:	fe010113          	addi	sp,sp,-32
+   10078:	00812e23          	sw	s0,28(sp)
+   1007c:	02010413          	addi	s0,sp,32
+   10080:	00f00793          	li	a5,15
+   10084:	fef42623          	sw	a5,-20(s0)
+   10088:	00900793          	li	a5,9
+   1008c:	fef42423          	sw	a5,-24(s0)
+   10090:	fec42703          	lw	a4,-20(s0)
+   10094:	fe842783          	lw	a5,-24(s0)
+   10098:	00f707b3          	add	a5,a4,a5
+   1009c:	fef42223          	sw	a5,-28(s0)
+   100a0:	00000793          	li	a5,0
+   100a4:	00078513          	mv	a0,a5
+   100a8:	01c12403          	lw	s0,28(sp)
+   100ac:	02010113          	addi	sp,sp,32
+   100b0:	00008067          	ret
+
+Disassembly of section .comment:
+
+00000000 <.comment>:
+   0:	3a434347          	fmsub.d	ft6,ft6,ft4,ft7,rmm
+   4:	2820                	fld	fs0,80(s0)
+   6:	29554e47          	fmsub.s	ft8,fa0,fs5,ft5,rmm
+   a:	3820                	fld	fs0,112(s0)
+   c:	322e                	fld	ft4,232(sp)
+   e:	302e                	fld	ft0,232(sp)
+	...

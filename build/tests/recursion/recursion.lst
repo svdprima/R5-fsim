@@ -1,0 +1,29 @@
+
+/home/albert/Proga/risc-V/R5-fsim/build/tests/recursion/recursion.elf:     file format elf32-littleriscv
+
+
+Disassembly of section .text:
+
+00010074 <recursion>:
+   10074:	ff010113          	addi	sp,sp,-16
+   10078:	00112623          	sw	ra,12(sp)
+   1007c:	00812423          	sw	s0,8(sp)
+   10080:	01010413          	addi	s0,sp,16
+   10084:	ff1ff0ef          	jal	ra,10074 <recursion>
+   10088:	00050793          	mv	a5,a0
+   1008c:	00078513          	mv	a0,a5
+   10090:	00c12083          	lw	ra,12(sp)
+   10094:	00812403          	lw	s0,8(sp)
+   10098:	01010113          	addi	sp,sp,16
+   1009c:	00008067          	ret
+
+Disassembly of section .comment:
+
+00000000 <.comment>:
+   0:	3a434347          	fmsub.d	ft6,ft6,ft4,ft7,rmm
+   4:	2820                	fld	fs0,80(s0)
+   6:	29554e47          	fmsub.s	ft8,fa0,fs5,ft5,rmm
+   a:	3820                	fld	fs0,112(s0)
+   c:	322e                	fld	ft4,232(sp)
+   e:	302e                	fld	ft0,232(sp)
+	...
