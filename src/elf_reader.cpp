@@ -48,7 +48,7 @@ unsigned long int Elf_reader::Entry()
 
 void Elf_reader::Load(std::vector<uint32_t> &instructions)
 {
-	unsigned long int mem_end;
+	uint32_t mem_end;
 	if(n_ph > 0)
 		mem_end = phdrs[0].p_vaddr + phdrs[0].p_memsz;
 	for(int i = 0; i < n_ph; i++)
