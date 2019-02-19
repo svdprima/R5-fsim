@@ -16,7 +16,7 @@ READELF = riscv64-unknown-linux-gnu-readelf
 RISCV_CFLAGS = -mabi=ilp32 -march=rv32i -nostdlib
 
 CC = g++
-CFLAGS =
+CFLAGS = -Wall -Wextra
 LDFLAGS =
 LIBS = -lelf
 
@@ -40,8 +40,6 @@ $(BUILD_TEST)/$(TEST).segments: $(BUILD_TEST)/$(TEST).elf
 
 $(BUILD_TEST)/$(TEST).elf: create_dirs
 	@$(RISCV_CC) $(RISCV_CFLAGS) $(TESTS_HOME)/$(TEST).c -o $@
-
-
 
 build_src: $(OBJ_FILES)
 	@$(CC) $(LDFLAGS) -o $(BUILD_SRC)/simulator $^ $(LIBS)

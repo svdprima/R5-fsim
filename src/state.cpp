@@ -4,7 +4,12 @@ State::State(uint32_t initial_pc, std::vector<uint32_t> &instructions)
 {
 	pc = initial_pc;
 	for(int i = 0; i < 32; ++i)
-		regs[i] = 0;
+	{
+		if (i != 2)
+			regs[i] = 0;
+		else
+			regs[i] = 5000;
+	}
 	mem.resize(instructions.size()*sizeof(uint32_t));
 	memcpy(&mem[0], (void*)instructions.data(), instructions.size()*sizeof(uint32_t));
 }
@@ -110,4 +115,16 @@ uint8_t State::ReadByte(uint32_t addr)
 	if(addr > mem.size())
 		errx(EXIT_FAILURE, "Out of physical memory, addr - %#010x.", addr);
 	return mem[addr];
+}
+
+void State::PrintPc()
+{
+	printf ("The PC is %x\n", pc);
+}
+
+void State::PrintReg(uint32_t reg_num)
+{
+	if (reg_num >= 32)
+			printf("Invalid reg number!\n");
+	printf ("Register #%d: %x", reg_num, regs[reg_num]);
 }

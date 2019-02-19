@@ -28,6 +28,8 @@ public:
     uint32_t ReadWord(uint32_t addr);
     uint16_t ReadHalfWord(uint32_t addr);
     uint8_t ReadByte(uint32_t addr);
+	void PrintPc();
+	void PrintReg(uint32_t reg_num);
     ~State() {}
 };
 
