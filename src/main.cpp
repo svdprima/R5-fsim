@@ -1,5 +1,6 @@
 #include "elf_reader.h"
 #include "decoder.hpp"
+#include "aux.hpp"
 #include <stdio.h>
 
 int main(int argc, char** argv)
@@ -16,14 +17,20 @@ int main(int argc, char** argv)
     
     Decoder DCD = Decoder ();
     Instruction decoded_instr = Instruction ();
-    uint32_t cur_instr = 0;
-    //while (cur_instr != 0x00008067)
-    for (int i = 0; i < 1000 && cur_instr != 0x00008067; i++)
+    bool is_verbose = true;
+    try
     {
-        cur_instr = instr[state.GetPc()/4];
-        decoded_instr = DCD.Decode (cur_instr);
-        decoded_instr.PrintInstr();
-        decoded_instr.Exec_Command (&state);
+        while (true)
+        {
+            decoded_instr = DCD.Decode (state.ReadWord(state.GetPc()));
+            decoded_instr.PrintInstr(is_verbose);
+            decoded_instr.Exec_Command (&state);
+        }
     }
+    catch (HartException &exc)
+    {
+        printf ("%s", exc.what());
+    }
+    state.MemDump();
     return 0;
 }

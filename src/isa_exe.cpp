@@ -1,6 +1,7 @@
 #include "decoder.hpp"
 #include "state.h"
 #include "isa_exe.hpp"
+#include "aux.hpp"
 #include <cstdlib>
 #include <stdio.h>
 
@@ -8,7 +9,7 @@
 
 void ADDIExec   (const Instruction* instr, State* state)
 {
-    state->SetReg(instr->GetRd(), state->GetReg(instr->GetRs1()) + instr->GetImm()); 
+    state->SetReg(instr->GetRd(), state->GetReg(instr->GetRs1()) + static_cast<int32_t>(instr->GetImm())); 
     PC_incr;
 }
 
@@ -44,19 +45,19 @@ void ANDIExec   (const Instruction* instr, State* state)
 
 void SBExec     (const Instruction* instr, State* state)
 {
-    state->WriteByte (instr->GetImm() + state->GetReg(instr->GetRs1()), static_cast<uint8_t>(state->GetReg(instr->GetRs2())));
+    state->WriteByte (instr->GetImm() + static_cast<int32_t>(state->GetReg(instr->GetRs1())), state->GetReg(instr->GetRs2()));
     PC_incr;
 }
 
 void SHExec     (const Instruction* instr, State* state)
 {
-    state->WriteHalfWord (instr->GetImm() + state->GetReg(instr->GetRs1()), static_cast<uint16_t>(state->GetReg(instr->GetRs2())));
+    state->WriteHalfWord (instr->GetImm() + static_cast<int32_t>(state->GetReg(instr->GetRs1()), state->GetReg(instr->GetRs2())));
     PC_incr;
 }
 
 void SWExec     (const Instruction* instr, State* state)
 {
-    state->WriteWord (instr->GetImm() + state->GetReg(instr->GetRs1()), state->GetReg(instr->GetRs2()));
+    state->WriteWord (instr->GetImm() + static_cast<int32_t>(state->GetReg(instr->GetRs1())), state->GetReg(instr->GetRs2()));
     PC_incr;
 }
 
@@ -74,7 +75,7 @@ void LHExec     (const Instruction* instr, State* state)
 
 void LWExec     (const Instruction* instr, State* state)
 {
-    state->SetReg(instr->GetRd(), state->ReadWord (instr->GetImm() + state->GetReg(instr->GetRs1())));
+    state->SetReg(instr->GetRd(), static_cast<int32_t>(state->ReadWord (instr->GetImm() + state->GetReg(instr->GetRs1()))));
     PC_incr;
 }
 
@@ -148,7 +149,9 @@ void JALExec    (const Instruction* instr, State* state)
 void JALRExec   (const Instruction* instr, State* state)
 {
    state->SetReg(instr->GetRd(), state->GetPc() + 4);
-   state->SetPc(state->GetPc() + (static_cast<int32_t>(instr->GetImm()) & 0xFFFFFFFE));  
+   state->SetPc(state->GetPc() + ((instr->GetRs1() + static_cast<int32_t>(instr->GetImm())) & 0xFFFFFFFE));  
+   if (instr->GetOppcode() == 0b1100111 && instr->GetRs1() == 1 && instr->GetRd() == 0)
+       throw HartException("Jumping to return address!\n");
 }
 
 void SLLIExec   (const Instruction* instr, State* state)
@@ -239,4 +242,9 @@ void ANDExec    (const Instruction* instr, State* state)
 void DUMMYExec  (const Instruction* instr, State* state)
 {
     printf ("DUMMY instruction\n");
+}
+
+void ECALLExec  (const Instruction* instr, State* state)
+{
+    throw HartException ("Finished execution!\n");
 }

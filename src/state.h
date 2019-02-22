@@ -30,6 +30,7 @@ public:
     uint8_t ReadByte(uint32_t addr);
 	void PrintPc();
 	void PrintReg(uint32_t reg_num);
+    void PrintWord(uint32_t addr);
     ~State() {}
 };
 

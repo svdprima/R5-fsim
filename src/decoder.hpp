@@ -66,6 +66,7 @@ private:
     uint8_t funct7;
     uint32_t imm;
     void (*cmd) (const Instruction*, State*);
+    const char* command_name;
 public:
     InstrType type;
     Instruction ()
@@ -94,8 +95,8 @@ public:
     void SetRs2 (uint8_t RS2);
     void SetFunct7 (uint8_t f7);
     void SetImm (uint32_t IMM);
-    void SetCommand (void (*command) (const Instruction*, State*));
-    void PrintInstr ();
+    void SetCommand (const char* c_name, void (*command) (const Instruction*, State*));
+    void PrintInstr (const bool is_verbose);
 };
 
 struct CommandDescription
@@ -148,7 +149,7 @@ const CommandDescription CommandList [] =
     {"AND",   &ANDExec,   Oppcodes::OP,      0b111},
     //{"FENCE", &FENCEExec, Oppcodes::MISC-MEM},
     //{"FENCEI",&FENCEIExec,Oppcodes::MISC-MEM,0b001},
-    //{"ECALL", &ECALLExec, Oppcodes::SYSTEM},
+    {"ECALL", &ECALLExec, Oppcodes::SYSTEM},
     //{"EBREAK",&EBREAKExec,Oppcodes::SYSTEM,  0b000, 0b1}, //not a funct7, but the entire imm
     //{"CSRRW", &CSRRWExec, Oppcodes::SYSTEM,  0b001},
     //{"CSRRS", &CSRRSExec, Oppcodes::SYSTEM,  0b010},

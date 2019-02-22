@@ -8,7 +8,7 @@ State::State(uint32_t initial_pc, std::vector<uint32_t> &instructions)
 		if (i != 2)
 			regs[i] = 0;
 		else
-			regs[i] = 5000;
+			regs[i] = 5000; //initialising stack pointer
 	}
 	mem.resize(instructions.size()*sizeof(uint32_t));
 	memcpy(&mem[0], (void*)instructions.data(), instructions.size()*sizeof(uint32_t));
@@ -37,10 +37,10 @@ void State::WriteWord(uint32_t addr, uint32_t data)
 {
 	if(addr+3 > mem.size())
 		errx(EXIT_FAILURE, "Out of physical memory, addr - %#010x.", addr);
-	mem[addr+3] = (uint8_t)data;
-	mem[addr+2] = (uint8_t)(data>>8);
-	mem[addr+1] = (uint8_t)(data>>16);
-	mem[addr]   = (uint8_t)(data>>24);
+	mem[addr] = (uint8_t)data;
+	mem[addr + 1] = (uint8_t)(data >> 8);
+	mem[addr + 2] = (uint8_t)(data >> 16);
+	mem[addr + 3] = (uint8_t)(data >> 24);
 }
 
 
@@ -49,8 +49,8 @@ void State::WriteHalfWord(uint32_t addr, uint16_t data)
 {
 	if(addr+1 > mem.size())
 		errx(EXIT_FAILURE, "Out of physical memory, addr - %#010x.", addr);
-	mem[addr+1] = (uint8_t)data;
-	mem[addr]   = (uint8_t)(data>>8);
+	mem[addr]       = (uint8_t)data;
+	mem[addr + 1]   = (uint8_t)(data >> 8);
 }
 
 
@@ -78,8 +78,6 @@ uint32_t State::GetPc()
 	return pc;
 }
 
-
-
 uint32_t State::GetReg(uint8_t reg_num)
 {
 	if(reg_num > 32)
@@ -93,10 +91,10 @@ uint32_t State::ReadWord(uint32_t addr)
 {
 	if(addr+3 > mem.size())
 		errx(EXIT_FAILURE, "Out of physical memory, addr - %#010x.", addr);
-	return	((uint32_t)mem[addr]<<24) | 
-			((uint32_t)mem[addr+1]<<16) | 
-			((uint32_t)mem[addr+2]<<8) | 
-			(uint32_t)mem[addr];
+	return	((uint32_t)mem[addr + 3] << 24) | 
+			((uint32_t)mem[addr + 2] << 16) | 
+			((uint32_t)mem[addr + 1] << 8)  | 
+			 (uint32_t)mem[addr];
 }
 
 
@@ -105,7 +103,8 @@ uint16_t State::ReadHalfWord(uint32_t addr)
 {
 	if(addr+1 > mem.size())
 		errx(EXIT_FAILURE, "Out of physical memory, addr - %#010x.", addr);
-	return ((uint16_t)mem[addr]<<8) | (uint16_t)mem[addr+1];
+	return ((uint16_t)mem[addr + 1] << 8) | 
+            (uint16_t)mem[addr];
 }
 
 
@@ -126,5 +125,10 @@ void State::PrintReg(uint32_t reg_num)
 {
 	if (reg_num >= 32)
 			printf("Invalid reg number!\n");
-	printf ("Register #%d: %x", reg_num, regs[reg_num]);
+	printf ("Register #%d: %x\n", reg_num, regs[reg_num]);
+}
+
+void State::PrintWord(uint32_t addr)
+{
+    printf ("Word at specified adress: %x\n", ReadWord(addr));
 }

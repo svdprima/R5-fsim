@@ -1,7 +1,8 @@
 #include "decoder.hpp"
 
-void Instruction::SetCommand (void (*command) (const Instruction*, State*))
+void Instruction::SetCommand (const char* c_name, void (*command) (const Instruction*, State*))
 {
+    command_name = c_name;
     cmd = command;
 }
 
@@ -40,7 +41,8 @@ Instruction Decoder::Decode (uint32_t raw_instr)
         dec_instr.SetFunct7((0b11111110000000000000000000000000 & raw_instr) >> 25); 
     }
 
-    else if (dec_instr.GetOppcode() == 0b0000011 || dec_instr.GetOppcode() == 0b0010011)
+    else if (dec_instr.GetOppcode() == 0b0000011 || dec_instr.GetOppcode() == 0b0010011 || 
+             dec_instr.GetOppcode() == 0b1110011 || dec_instr.GetOppcode() == 0b1100111)
     {
         dec_instr.type  = InstrType::IType;
         dec_instr.SetRd((0b111110000000 & raw_instr) >> 7);
@@ -76,9 +78,9 @@ Instruction Decoder::Decode (uint32_t raw_instr)
     }
     uint8_t cmd_id = (dec_instr.GetOppcode() >> 2) | (dec_instr.GetFunct3() << 5);
     if (!dec_instr.GetFunct7())
-        dec_instr.SetCommand(SortedCommands.at(cmd_id)[0].exec_command);
+        dec_instr.SetCommand(SortedCommands.at(cmd_id)[0].c_name, SortedCommands.at(cmd_id)[0].exec_command);
     else
-        dec_instr.SetCommand(SortedCommands.at(cmd_id)[1].exec_command);
+        dec_instr.SetCommand(SortedCommands.at(cmd_id)[0].c_name, SortedCommands.at(cmd_id)[1].exec_command);
     return dec_instr;
 }
 
@@ -180,55 +182,59 @@ void Instruction::Exec_Command (State* state)
     cmd (this, state);
 }
 
-void Instruction::PrintInstr ()
+void Instruction::PrintInstr (const bool is_verbose)
 {
-    switch (type)
+    printf ("%s\n", command_name);
+    if (is_verbose)
     {
-        case InstrType::RType:
-            printf ("RType\n");
-            printf ("oppcode: %u\n", oppcode);
-            printf ("rd     : %u\n", rd);
-            printf ("funct3 : %u\n", funct3);
-            printf ("rs1    : %u\n", rs1);
-            printf ("rs2    : %u\n", rs2);
-            printf ("funct7 : %u\n", funct7);
-            break;
-        case InstrType::IType:
-            printf ("IType\n");
-            printf ("oppcode: %u\n", oppcode);
-            printf ("rd     : %u\n", rd);
-            printf ("funct3 : %u\n", funct3);
-            printf ("rs1    : %u\n", rs1);
-            printf ("imm    : %u\n", imm);
-            break;
-        case InstrType::SType:
-            printf ("SType\n");
-            printf ("oppcode: %u\n", oppcode);
-            printf ("funct3 : %u\n", funct3);
-            printf ("rs1    : %u\n", rs1);
-            printf ("rs2    : %u\n", rs2);
-            printf ("imm    : %u\n", imm);
-            break;
-        case InstrType::BType:
-            printf ("BType\n");
-            printf ("oppcode: %u\n", oppcode);
-            printf ("funct3 : %u\n", funct3);
-            printf ("rs1    : %u\n", rs1);
-            printf ("rs2    : %u\n", rs2);
-            printf ("imm    : %u\n", imm);
-            break;
-        case InstrType::UType:
-            printf ("UType\n");
-            printf ("rd     : %u\n", rd);
-            printf ("imm    : %u\n", imm);
-            break;
-        case InstrType::JType:
-            printf ("JType\n");
-            printf ("rd     : %u\n", rd);
-            printf ("imm    : %u\n", imm);
-            break;
-        default:
-            printf ("Type is undefined\n");
+        switch (type)
+        {
+            case InstrType::RType:
+                printf ("RType\n");
+                printf ("oppcode: %u\n", oppcode);
+                printf ("rd     : %u\n", rd);
+                printf ("funct3 : %u\n", funct3);
+                printf ("rs1    : %u\n", rs1);
+                printf ("rs2    : %u\n", rs2);
+                printf ("funct7 : %u\n", funct7);
+                break;
+            case InstrType::IType:
+                printf ("IType\n");
+                printf ("oppcode: %u\n", oppcode);
+                printf ("rd     : %u\n", rd);
+                printf ("funct3 : %u\n", funct3);
+                printf ("rs1    : %u\n", rs1);
+                printf ("imm    : %u\n", imm);
+                break;
+            case InstrType::SType:
+                printf ("SType\n");
+                printf ("oppcode: %u\n", oppcode);
+                printf ("funct3 : %u\n", funct3);
+                printf ("rs1    : %u\n", rs1);
+                printf ("rs2    : %u\n", rs2);
+                printf ("imm    : %u\n", imm);
+                break;
+            case InstrType::BType:
+                printf ("BType\n");
+                printf ("oppcode: %u\n", oppcode);
+                printf ("funct3 : %u\n", funct3);
+                printf ("rs1    : %u\n", rs1);
+                printf ("rs2    : %u\n", rs2);
+                printf ("imm    : %u\n", imm);
+                break;
+            case InstrType::UType:
+                printf ("UType\n");
+                printf ("rd     : %u\n", rd);
+                printf ("imm    : %u\n", imm);
+                break;
+            case InstrType::JType:
+                printf ("JType\n");
+                printf ("rd     : %u\n", rd);
+                printf ("imm    : %u\n", imm);
+                break;
+            default:
+                printf ("Type is undefined\n");
+        }
+        printf ("\n");
     }
-    printf ("\n");
 }    

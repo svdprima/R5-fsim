@@ -50,7 +50,7 @@ void ORExec     (const Instruction* instr, State* state);
 void ANDExec    (const Instruction* instr, State* state);
 //void FENCEExec  (const Instruction* instr, State* state);
 //void FENCEIExec (const Instruction* instr, State* state);
-//void ECALLExec  (const Instruction* instr, State* state);
+void ECALLExec  (const Instruction* instr, State* state);
 //void EBREAKExec (const Instruction* instr, State* state);
 //void CSRRWExec  (const Instruction* instr, State* state);
 //void CSRRSExec  (const Instruction* instr, State* state);
@@ -59,60 +59,5 @@ void ANDExec    (const Instruction* instr, State* state);
 //void CSRRSIExec (const Instruction* instr, State* state);
 //void CSRRCIExec (const Instruction* instr, State* state);
 void DUMMYExec  (const Instruction* instr, State* state);
-/*
-enum class Cmds: uint8_t
-{
-    LUI,
-    AUIPC,
-    JAL,
-    JALR,
-    BEQ,
-    BNE,
-    BLT,
-    BGE,
-    BLTU,
-    BGEU,
-    LB,
-    LH,
-    LW,
-    LBU,
-    LHU,
-    SB,
-    SH,
-    SW,
-    ADDI,
-    SLTI,
-    SLTIU,
-    XORI,
-    ORI,
-    ANDI,
-    SLLI,
-    SRLI,
-    SRAI,
-    ADD,
-    SUB,
-    SLL,
-    SLT,
-    SLTU,
-    XOR,
-    SRL,
-    SRA,
-    OR,
-    AND,
-    ECALL,
-    EBREAK,
-    URET,
-    SRET,
-    MRET,
-    WFI,
-    FENCE,
-    CSRRW,
-    CSRRS,
-    CSRRC,
-    CSRRWI,
-    CSRRSI,
-    CSRRCI,
-    UNKNOWN
-};
-*/
+
 #endif
