@@ -51,7 +51,7 @@ void SBExec     (const Instruction* instr, State* state)
 
 void SHExec     (const Instruction* instr, State* state)
 {
-    state->WriteHalfWord (instr->GetImm() + static_cast<int32_t>(state->GetReg(instr->GetRs1()), state->GetReg(instr->GetRs2())));
+    state->WriteHalfWord (instr->GetImm() + static_cast<int32_t>(state->GetReg(instr->GetRs1())), state->GetReg(instr->GetRs2()));
     PC_incr;
 }
 
