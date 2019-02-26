@@ -5,15 +5,19 @@
 
 int main(int argc, char** argv)
 {
+    if(argc != 2)
+        errx(EXIT_FAILURE, "usage : %s elf_file", argv[0]);
+
     Elf_reader ER;
     uint32_t PC = 0;
-    std::vector<uint32_t> instr;
+    std::vector<uint32_t> words;
 
     ER.Init(argv[1]);
-    ER.Load(instr);
+    ER.Load(words);
 
     PC = ER.Entry();
-    State state(PC, instr);
+    uint32_t n_pages = 20;
+    Hart_state hart_state(PC, words, n_pages);
     
     Decoder DCD = Decoder ();
     Instruction decoded_instr = Instruction ();
@@ -22,15 +26,15 @@ int main(int argc, char** argv)
     {
         while (true)
         {
-            decoded_instr = DCD.Decode (state.ReadWord(state.GetPc()));
+            decoded_instr = DCD.Decode (hart_state.Fetch(hart_state.GetPc()));
             decoded_instr.PrintInstr(is_verbose);
-            decoded_instr.Exec_Command (&state);
+            decoded_instr.Exec_Command (&hart_state);
         }
     }
     catch (HartException &exc)
     {
         printf ("%s", exc.what());
     }
-    state.MemDump();
+    hart_state.MemDump();
     return 0;
 }

@@ -21,8 +21,8 @@ private:
 public:
     Elf_reader() {}
     void Init(const char *file_name);
-    unsigned long int Entry(); // in bytes!
-    void Load(std::vector<uint32_t> &instructions);
+    uint32_t Entry();
+    void Load(std::vector<uint32_t> &words);
     ~Elf_reader();
 };
 

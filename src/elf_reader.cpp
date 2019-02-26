@@ -22,14 +22,14 @@ void Elf_reader::Init(const char *file_name)
 	if(ehdr.e_machine != EM_RISCV)
     	errx(EXIT_FAILURE, "\" %s \" is not a RISCV machine.", file_name);
 
-    if(ehdr.e_ident[EI_CLASS] != ELFCLASS32)
+	if(ehdr.e_ident[EI_CLASS] != ELFCLASS32)
     	errx(EXIT_FAILURE, "\" %s \" is not a 32 bit machine.", file_name);
-
+   	
    	if(elf_getphdrnum(e, &n_ph) != 0)
 		errx(EXIT_FAILURE, "elf_getphdrnum () failed : %s." , elf_errmsg(-1));
 
 	GElf_Phdr phdr;
-	for(int i = 0; i < n_ph; i++)
+	for(size_t i = 0; i < n_ph; i++)
 	{
     	if(gelf_getphdr(e, i, &phdr) != &phdr)
 			errx(EXIT_FAILURE, "getphdr () failed : %s.", elf_errmsg(-1));
@@ -39,32 +39,32 @@ void Elf_reader::Init(const char *file_name)
 
 
 
-unsigned long int Elf_reader::Entry()
+uint32_t Elf_reader::Entry()
 {
 	return ehdr.e_entry;
 }
 
 
 
-void Elf_reader::Load(std::vector<uint32_t> &instructions)
+void Elf_reader::Load(std::vector<uint32_t> &words)
 {
 	uint32_t mem_end;
 	if(n_ph > 0)
 		mem_end = phdrs[0].p_vaddr + phdrs[0].p_memsz;
-	for(int i = 0; i < n_ph; i++)
+	for(size_t i = 0; i < n_ph; i++)
 		if((phdrs[i].p_vaddr + phdrs[i].p_memsz) > mem_end)
 			mem_end = phdrs[i].p_vaddr + phdrs[i].p_memsz;
 
-	instructions.resize(mem_end/sizeof(uint32_t));
+	words.resize(mem_end/sizeof(uint32_t));
 
-	for(int i = 0; i < n_ph; i++)
+	for(size_t i = 0; i < n_ph; i++)
 	{
 		std::vector<uint32_t> buf(phdrs[i].p_memsz);
 		lseek(fd, phdrs[i].p_offset, SEEK_SET);
 		if(read(fd, &(buf[0]), phdrs[i].p_filesz) < 0)
 			errx(EXIT_FAILURE, "read() failed : %s." , elf_errmsg(-1));
-		instructions.insert(instructions.begin() + phdrs[i].p_vaddr / sizeof(uint32_t), 
-																buf.begin(), buf.end());
+		words.insert(words.begin() + phdrs[i].p_paddr / sizeof(uint32_t), 
+												buf.begin(), buf.end());
 	}
 }
 

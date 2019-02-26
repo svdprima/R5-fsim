@@ -5,7 +5,7 @@
 #include <iostream>
 #include <array>
 #include "isa_exe.hpp"
-#include "state.h"
+#include "hart_state.h"
 
 enum class InstrType: uint8_t
 {
@@ -65,7 +65,7 @@ private:
     uint8_t rs2;
     uint8_t funct7;
     uint32_t imm;
-    void (*cmd) (const Instruction*, State*);
+    void (*cmd) (const Instruction*, Hart_state*);
     const char* command_name;
 public:
     InstrType type;
@@ -87,7 +87,7 @@ public:
     uint8_t GetRs2 () const;
     uint8_t GetFunct7 () const;
     uint32_t GetImm () const;
-    void Exec_Command (State* state);
+    void Exec_Command (Hart_state* hart_state);
     void SetOppcode (uint8_t oppc);
     void SetRd (uint8_t RD);
     void SetFunct3 (uint8_t f3);
@@ -95,14 +95,14 @@ public:
     void SetRs2 (uint8_t RS2);
     void SetFunct7 (uint8_t f7);
     void SetImm (uint32_t IMM);
-    void SetCommand (const char* c_name, void (*command) (const Instruction*, State*));
+    void SetCommand (const char* c_name, void (*command) (const Instruction*, Hart_state*));
     void PrintInstr (const bool is_verbose);
 };
 
 struct CommandDescription
 {
     const char* c_name;
-    void (*exec_command) (const Instruction*, State*);
+    void (*exec_command) (const Instruction*, Hart_state*);
     Oppcodes oppcode;
     uint8_t funct3 = 0;
     uint8_t funct7 = 0;

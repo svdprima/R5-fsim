@@ -1,6 +1,6 @@
 #include "decoder.hpp"
 
-void Instruction::SetCommand (const char* c_name, void (*command) (const Instruction*, State*))
+void Instruction::SetCommand (const char* c_name, void (*command) (const Instruction*, Hart_state*))
 {
     command_name = c_name;
     cmd = command;
@@ -177,9 +177,9 @@ void Instruction::SetImm (uint32_t IMM)
     imm = IMM;
 }
 
-void Instruction::Exec_Command (State* state)
+void Instruction::Exec_Command (Hart_state* hart_state)
 {
-    cmd (this, state);
+    cmd (this, hart_state);
 }
 
 void Instruction::PrintInstr (const bool is_verbose)
