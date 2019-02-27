@@ -27,7 +27,7 @@ Instruction Decoder::Decode (uint32_t raw_instr)
         dec_instr.SetRd((0b111110000000 & raw_instr) >> 7);
         dec_instr.SetImm((0b1111111111000000000000000000000 & raw_instr) >> 21);
         dec_instr.SetImm(dec_instr.GetImm() | (0b100000000000000000000 & raw_instr) >> 10);
-        dec_instr.SetImm(dec_instr.GetImm() | (0b11111111000000000000 & raw_instr));
+        dec_instr.SetImm(dec_instr.GetImm() | (0b11111111000000000000 & raw_instr) >> 1);
         dec_instr.SetImm(dec_instr.GetImm() | (0b10000000000000000000000000000000 & raw_instr) >> 12);
         if (0b10000000000000000000000000000000 & raw_instr) //sign extension
             dec_instr.SetImm(dec_instr.GetImm() | 0b11111111111100000000000000000000); 
@@ -208,7 +208,7 @@ void Instruction::PrintInstr (const bool is_verbose)
                 printf ("rd     : %u\n", rd);
                 printf ("funct3 : %u\n", funct3);
                 printf ("rs1    : %u\n", rs1);
-                printf ("imm    : %u\n", imm);
+                printf ("imm    : %x\n", imm);
                 break;
             case InstrType::SType:
                 printf ("SType\n");
@@ -216,7 +216,7 @@ void Instruction::PrintInstr (const bool is_verbose)
                 printf ("funct3 : %u\n", funct3);
                 printf ("rs1    : %u\n", rs1);
                 printf ("rs2    : %u\n", rs2);
-                printf ("imm    : %u\n", imm);
+                printf ("imm    : %x\n", imm);
                 break;
             case InstrType::BType:
                 printf ("BType\n");
@@ -224,17 +224,17 @@ void Instruction::PrintInstr (const bool is_verbose)
                 printf ("funct3 : %u\n", funct3);
                 printf ("rs1    : %u\n", rs1);
                 printf ("rs2    : %u\n", rs2);
-                printf ("imm    : %u\n", imm);
+                printf ("imm    : %x\n", imm);
                 break;
             case InstrType::UType:
                 printf ("UType\n");
                 printf ("rd     : %u\n", rd);
-                printf ("imm    : %u\n", imm);
+                printf ("imm    : %x\n", imm);
                 break;
             case InstrType::JType:
                 printf ("JType\n");
                 printf ("rd     : %u\n", rd);
-                printf ("imm    : %u\n", imm);
+                printf ("imm    : %x\n", imm);
                 break;
             default:
                 printf ("Type is undefined\n");
