@@ -9,14 +9,14 @@ BUILD_SRC = $(BUILD_HOME)/src
 SRC_FILES = $(wildcard $(SRC_HOME)/*.cpp)
 OBJ_FILES = $(patsubst $(SRC_HOME)/%.cpp,$(BUILD_SRC)/%.o,$(SRC_FILES))
 
-RISCV_CC = riscv64-unknown-linux-gnu-gcc
-OBJCOPY = riscv64-unknown-linux-gnu-objcopy 
-OBJDUMP = riscv64-unknown-linux-gnu-objdump
-READELF = riscv64-unknown-linux-gnu-readelf
-RISCV_CFLAGS = -mabi=ilp32 -march=rv32i -nostdlib
+RISCV_CC = riscv32-unknown-elf-gcc-8.2.0
+OBJCOPY = riscv32-unknown-elf-objcopy  
+OBJDUMP = riscv32-unknown-elf-objdump
+READELF = riscv32-unknown-elf-readelf
+RISCV_CFLAGS = -mabi=ilp32 -march=rv32im
 
 CC = g++
-CFLAGS = -Wall -Wextra
+CFLAGS = -Wall -Wextra -O2
 LDFLAGS =
 LIBS = -lelf
 

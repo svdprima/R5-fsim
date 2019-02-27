@@ -5,10 +5,10 @@ There are 2 program headers, starting at offset 52
 
 Program Headers:
   Type           Offset   VirtAddr   PhysAddr   FileSiz MemSiz  Flg Align
-  LOAD           0x000000 0x00010000 0x00010000 0x000a0 0x000a0 R E 0x1000
-  GNU_STACK      0x000000 0x00000000 0x00000000 0x00000 0x00000 RW  0x10
+  LOAD           0x000000 0x00010000 0x00010000 0x00620 0x00620 R E 0x1000
+  LOAD           0x000620 0x00011620 0x00011620 0x00444 0x00460 RW  0x1000
 
  Section to Segment mapping:
   Segment Sections...
    00     .text 
-   01     
+   01     .eh_frame .init_array .fini_array .data .sdata .bss 

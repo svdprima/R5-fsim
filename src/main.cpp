@@ -16,8 +16,8 @@ int main(int argc, char** argv)
     ER.Load(words);
 
     PC = ER.Entry();
-    uint32_t n_pages = 20;
-    Hart_state hart_state(PC, words, n_pages);
+    uint32_t n_pages = 50;
+    HartState hart_state(PC, words, n_pages);
     
     Decoder DCD = Decoder ();
     Instruction decoded_instr = Instruction ();

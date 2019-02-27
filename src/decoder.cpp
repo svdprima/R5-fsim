@@ -1,6 +1,6 @@
 #include "decoder.hpp"
 
-void Instruction::SetCommand (const char* c_name, void (*command) (const Instruction*, Hart_state*))
+void Instruction::SetCommand (const char* c_name, void (*command) (const Instruction*, HartState*))
 {
     command_name = c_name;
     cmd = command;
@@ -8,6 +8,7 @@ void Instruction::SetCommand (const char* c_name, void (*command) (const Instruc
 
 Instruction Decoder::Decode (uint32_t raw_instr)
 {
+    printf ("Raw instr is:%x\n", raw_instr);
     Instruction dec_instr = Instruction ();
     dec_instr.SetOppcode (0b1111111 & raw_instr);
    
@@ -80,7 +81,14 @@ Instruction Decoder::Decode (uint32_t raw_instr)
     if (!dec_instr.GetFunct7())
         dec_instr.SetCommand(SortedCommands.at(cmd_id)[0].c_name, SortedCommands.at(cmd_id)[0].exec_command);
     else
-        dec_instr.SetCommand(SortedCommands.at(cmd_id)[0].c_name, SortedCommands.at(cmd_id)[1].exec_command);
+    {
+        if (dec_instr.GetFunct7() == 0b1)
+            dec_instr.SetCommand(SortedCommands.at(cmd_id).back().c_name, 
+                                 SortedCommands.at(cmd_id).back().exec_command);
+        else
+            dec_instr.SetCommand(SortedCommands.at(cmd_id)[1].c_name,
+                                 SortedCommands.at(cmd_id)[1].exec_command);
+    }
     return dec_instr;
 }
 
@@ -97,13 +105,9 @@ Decoder::Decoder ()
         }
         cmd_id = (static_cast<uint8_t>(CommandList[i].oppcode) >> 2) | (CommandList[i].funct3 << 5);
         if (!CommandList[i].funct7)
-        {
             SortedCommands.at(cmd_id) =std::vector<CommandDescription> (1, CommandList[i]);
-        }
         else
-        {
-            SortedCommands.at(cmd_id).insert(SortedCommands.at(cmd_id).end(), CommandList[i]); //zero-funct7 command should go before non-zero funct7 one in CommandList   
-        }
+            SortedCommands.at(cmd_id).push_back(CommandList[i]); //zero-funct7 command should go before non-zero funct7 one in CommandList   
     }
 }
 
@@ -177,7 +181,7 @@ void Instruction::SetImm (uint32_t IMM)
     imm = IMM;
 }
 
-void Instruction::Exec_Command (Hart_state* hart_state)
+void Instruction::Exec_Command (HartState* hart_state)
 {
     cmd (this, hart_state);
 }

@@ -1,5 +1,5 @@
-#ifndef STATE_H
-#define STATE_H
+#ifndef HART_STATE_H
+#define HART_STATE_H
 
 #include <stdint.h>
 #include <stdlib.h>
@@ -8,7 +8,7 @@
 #include <fstream>
 #include "mmu.h"
 
-class Hart_state
+class HartState
 {
 private:
     uint32_t pc;
@@ -16,7 +16,7 @@ private:
     MMU _MMU;
 
 public:
-    Hart_state(uint32_t initial_pc, std::vector<uint32_t> &words, uint32_t n_pages);
+    HartState(uint32_t initial_pc, std::vector<uint32_t> &words, uint32_t n_pages);
     void SetPc(uint32_t pc_value);
     void SetSatp(uint32_t satp_value);
     void SetReg(uint8_t reg_num, uint32_t reg_value);
@@ -34,7 +34,7 @@ public:
 	void PrintPc();
 	void PrintReg(uint32_t reg_num);
     void PrintWord(uint32_t va);
-    ~Hart_state() {}
+    ~HartState() {}
 };
 
 #endif

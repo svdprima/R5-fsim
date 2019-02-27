@@ -5,246 +5,307 @@
 #include <cstdlib>
 #include <stdio.h>
 
-#define PC_incr hart_state->SetPc(hart_state->GetPc() + 4)
+#define PC_incr hart_state->SetPc(GET_PC() + 4)
+#define RDn instr->GetRd()
+#define RDv  (hart_state->GetReg(instr->GetRd()))
+#define RS1n instr->GetRs1()
+#define RS1v (hart_state->GetReg(instr->GetRs1()))
+#define RS2n instr->GetRs2()
+#define RS2v (hart_state->GetReg(instr->GetRs2()))
+#define SET_PC(x) (hart_state->SetPc(x))
+#define GET_PC()  (hart_state->GetPc())
+#define SET_R(x, val) (hart_state->SetReg(x, val))
+#define GET_R(x) (hart_state->GetReg(x));
+#define IMM instr->GetImm()
 
-void ADDIExec   (const Instruction* instr, Hart_state* hart_state)
+void ADDIExec   (const Instruction* instr, HartState* hart_state)
 {
-    hart_state->SetReg(instr->GetRd(), hart_state->GetReg(instr->GetRs1()) + static_cast<int32_t>(instr->GetImm())); 
+    SET_R(RDn, RS1v + static_cast<int32_t>(IMM)); 
     PC_incr;
 }
 
-void SLTIExec   (const Instruction* instr, Hart_state* hart_state)
+void SLTIExec   (const Instruction* instr, HartState* hart_state)
 {
-    (int32_t)hart_state->GetReg(instr->GetRs1()) < (int32_t)instr->GetImm() ? hart_state->SetReg(instr->GetRd(), 1) : hart_state->SetReg(instr->GetRd(), 0);
+    (int32_t)RS1v < (int32_t)IMM ? SET_R(RDn, 1) : SET_R(RDn, 0);
     PC_incr;
 }
 
-void SLTIUExec  (const Instruction* instr, Hart_state* hart_state)
+void SLTIUExec  (const Instruction* instr, HartState* hart_state)
 {
-    hart_state->GetReg(instr->GetRs1()) < instr->GetImm() ? hart_state->SetReg(instr->GetRd(), 1) : hart_state->SetReg(instr->GetRd(), 0);
+    RS1v < IMM ? SET_R(RDn, 1) : SET_R(RDn, 0);
     PC_incr;
 }
 
-void XORIExec   (const Instruction* instr, Hart_state* hart_state)
+void XORIExec   (const Instruction* instr, HartState* hart_state)
 {
-    hart_state->SetReg(instr->GetRd(), hart_state->GetReg(instr->GetRs1()) ^ instr->GetImm());
+    SET_R(RDn, RS1v ^ IMM);
     PC_incr;
 }
 
-void ORIExec    (const Instruction* instr, Hart_state* hart_state)
+void ORIExec    (const Instruction* instr, HartState* hart_state)
 {
-    hart_state->SetReg(instr->GetRd(), hart_state->GetReg(instr->GetRs1()) | instr->GetImm());
+    SET_R(RDn, RS1v | IMM);
     PC_incr;
 }
 
-void ANDIExec   (const Instruction* instr, Hart_state* hart_state)
+void ANDIExec   (const Instruction* instr, HartState* hart_state)
 {
-    hart_state->SetReg(instr->GetRd(), hart_state->GetReg(instr->GetRs1()) & instr->GetImm());
+    SET_R(RDn, RS1v & IMM);
     PC_incr;
 }
 
-void SBExec     (const Instruction* instr, Hart_state* hart_state)
+void SBExec     (const Instruction* instr, HartState* hart_state)
 {
-    hart_state->WriteByte (instr->GetImm() + static_cast<int32_t>(hart_state->GetReg(instr->GetRs1())), hart_state->GetReg(instr->GetRs2()));
+    hart_state->WriteByte (IMM + static_cast<int32_t>(RS1v), RS2v);
     PC_incr;
 }
 
-void SHExec     (const Instruction* instr, Hart_state* hart_state)
+void SHExec     (const Instruction* instr, HartState* hart_state)
 {
-    hart_state->WriteHalfWord (instr->GetImm() + static_cast<int32_t>(hart_state->GetReg(instr->GetRs1())), hart_state->GetReg(instr->GetRs2()));
+    hart_state->WriteHalfWord (IMM + static_cast<int32_t>(RS1v), RS2v);
     PC_incr;
 }
 
-void SWExec     (const Instruction* instr, Hart_state* hart_state)
+void SWExec     (const Instruction* instr, HartState* hart_state)
 {
-    hart_state->WriteWord (instr->GetImm() + static_cast<int32_t>(hart_state->GetReg(instr->GetRs1())), hart_state->GetReg(instr->GetRs2()));
+    hart_state->WriteWord (IMM + static_cast<int32_t>(RS1v), RS2v);
     PC_incr;
 }
 
-void LBExec     (const Instruction* instr, Hart_state* hart_state)
+void LBExec     (const Instruction* instr, HartState* hart_state)
 {
-    hart_state->SetReg(instr->GetRd(), static_cast<int32_t>(static_cast<int8_t>(hart_state->ReadByte (instr->GetImm() + hart_state->GetReg(instr->GetRs1())))));
+    SET_R(RDn, static_cast<int32_t>(static_cast<int8_t>(hart_state->ReadByte (IMM + RS1v))));
     PC_incr;
 }
 
-void LHExec     (const Instruction* instr, Hart_state* hart_state)
+void LHExec     (const Instruction* instr, HartState* hart_state)
 {
-    hart_state->SetReg(instr->GetRd(), static_cast<int32_t>(static_cast<int16_t>(hart_state->ReadHalfWord (instr->GetImm() + hart_state->GetReg(instr->GetRs1())))));
+    SET_R(RDn, static_cast<int32_t>(static_cast<int16_t>(hart_state->ReadHalfWord (IMM + RS1v))));
     PC_incr;
 }
 
-void LWExec     (const Instruction* instr, Hart_state* hart_state)
+void LWExec     (const Instruction* instr, HartState* hart_state)
 {
-    hart_state->SetReg(instr->GetRd(), static_cast<int32_t>(hart_state->ReadWord (instr->GetImm() + hart_state->GetReg(instr->GetRs1()))));
+    SET_R(RDn, static_cast<int32_t>(hart_state->ReadWord (IMM + RS1v)));
     PC_incr;
 }
 
-void LBUExec    (const Instruction* instr, Hart_state* hart_state)
+void LBUExec    (const Instruction* instr, HartState* hart_state)
 {
-    hart_state->SetReg(instr->GetRd(), static_cast <uint32_t>(hart_state->ReadByte (instr->GetImm() + hart_state->GetReg(instr->GetRs1()))));
+    SET_R(RDn, static_cast <uint32_t>(hart_state->ReadByte (IMM + RS1v)));
     PC_incr;
 }
 
-void LHUExec    (const Instruction* instr, Hart_state* hart_state)
+void LHUExec    (const Instruction* instr, HartState* hart_state)
 {
-    hart_state->SetReg(instr->GetRd(), static_cast <uint32_t>(hart_state->ReadHalfWord (instr->GetImm() + hart_state->GetReg(instr->GetRs1()))));
+    SET_R(RDn, static_cast <uint32_t>(hart_state->ReadHalfWord (IMM + RS1v)));
     PC_incr;
 }
 
 
-void LUIExec    (const Instruction* instr, Hart_state* hart_state)
+void LUIExec    (const Instruction* instr, HartState* hart_state)
 {
-    hart_state->SetReg (instr->GetRd(), (instr->GetImm()) << 12);
+    SET_R (RDn, (IMM) << 12);
     PC_incr;
 }
 
-void AUIPCExec  (const Instruction* instr, Hart_state* hart_state)
+void AUIPCExec  (const Instruction* instr, HartState* hart_state)
 {
-    hart_state->SetReg (instr->GetRd(), (instr->GetImm() << 12) + hart_state->GetPc());
+    SET_R (RDn, (IMM << 12) + GET_PC());
     PC_incr;
 }
 
-void BEQExec    (const Instruction* instr, Hart_state* hart_state)
+void BEQExec    (const Instruction* instr, HartState* hart_state)
 {
-    hart_state->GetReg(instr->GetRs1()) == hart_state->GetReg(instr->GetRs2()) ? 
-    hart_state->SetPc(hart_state->GetPc() + (instr->GetImm() << 1)) : hart_state->SetPc(hart_state->GetPc() + 4); 
+    RS1v == RS2v ? 
+    SET_PC(GET_PC() + (IMM << 1)) : SET_PC(GET_PC() + 4); 
 }
 
-void BNEExec    (const Instruction* instr, Hart_state* hart_state)
+void BNEExec    (const Instruction* instr, HartState* hart_state)
 {
-    hart_state->GetReg(instr->GetRs1()) != hart_state->GetReg(instr->GetRs2()) ?
-    hart_state->SetPc(hart_state->GetPc() + (instr->GetImm() << 1)) : hart_state->SetPc(hart_state->GetPc() + 4); 
+    RS1v != RS2v ?
+    SET_PC(GET_PC() + (IMM << 1)) : SET_PC(GET_PC() + 4); 
 }
 
-void BLTExec    (const Instruction* instr, Hart_state* hart_state)
+void BLTExec    (const Instruction* instr, HartState* hart_state)
 {
-    static_cast<int32_t>(hart_state->GetReg(instr->GetRs1())) < static_cast<int32_t>(hart_state->GetReg(instr->GetRs2())) ?
-    hart_state->SetPc(hart_state->GetPc() + (instr->GetImm() << 1)) : hart_state->SetPc(hart_state->GetPc() + 4); 
+    static_cast<int32_t>(RS1v) < static_cast<int32_t>(RS2v) ?
+    SET_PC(GET_PC() + (IMM << 1)) : SET_PC(GET_PC() + 4); 
 }
 
-void BGEExec    (const Instruction* instr, Hart_state* hart_state)
+void BGEExec    (const Instruction* instr, HartState* hart_state)
 {
-    static_cast<int32_t>(hart_state->GetReg(instr->GetRs1())) >= static_cast<int32_t>(hart_state->GetReg(instr->GetRs2())) ? 
-    hart_state->SetPc(hart_state->GetPc() + (static_cast<int32_t>(instr->GetImm()) << 1)) : hart_state->SetPc(hart_state->GetPc() + 4); 
+    static_cast<int32_t>(RS1v) >= static_cast<int32_t>(RS2v) ? 
+    hart_state->SetPc(GET_PC() + (static_cast<int32_t>(IMM) << 1)) : SET_PC(GET_PC() + 4); 
 }
 
-void BLTUExec   (const Instruction* instr, Hart_state* hart_state)
+void BLTUExec   (const Instruction* instr, HartState* hart_state)
 {
-    hart_state->GetReg(instr->GetRs1()) < hart_state->GetReg(instr->GetRs2()) ? 
-    hart_state->SetPc(hart_state->GetPc() + (instr->GetImm() << 1)) : hart_state->SetPc(hart_state->GetPc() + 4); 
+    RS1v < RS2v ? 
+    hart_state->SetPc(GET_PC() + (IMM << 1)) : SET_PC(GET_PC() + 4); 
 }
 
-void BGEUExec   (const Instruction* instr, Hart_state* hart_state)
+void BGEUExec   (const Instruction* instr, HartState* hart_state)
 {
-    hart_state->GetReg(instr->GetRs1()) > hart_state->GetReg(instr->GetRs2()) ?
-    hart_state->SetPc(hart_state->GetPc() + (instr->GetImm() << 1)) : hart_state->SetPc(hart_state->GetPc() + 4); 
+    RS1v > RS2v ?
+    hart_state->SetPc(GET_PC() + (IMM << 1)) : SET_PC(GET_PC() + 4); 
 }
 
-void JALExec    (const Instruction* instr, Hart_state* hart_state)
+void JALExec    (const Instruction* instr, HartState* hart_state)
 {
-    hart_state->SetReg(instr->GetRd(), hart_state->GetPc() + 4);
-    hart_state->SetPc(hart_state->GetPc() + (static_cast<int32_t>(instr->GetImm()) << 1));
+    SET_R(RDn, GET_PC() + 4);
+    SET_PC(GET_PC() + (static_cast<int32_t>(IMM) << 1));
 }
 
-void JALRExec   (const Instruction* instr, Hart_state* hart_state)
+void JALRExec   (const Instruction* instr, HartState* hart_state)
 {
-   hart_state->SetReg(instr->GetRd(), hart_state->GetPc() + 4);
-   hart_state->SetPc(hart_state->GetPc() + ((instr->GetRs1() + static_cast<int32_t>(instr->GetImm())) & 0xFFFFFFFE));  
-   if (instr->GetOppcode() == 0b1100111 && instr->GetRs1() == 1 && instr->GetRd() == 0)
-       throw HartException("Jumping to return address!\n");
+   SET_R(RDn, GET_PC() + 4);
+   SET_PC((RS1v + IMM) & 0xFFFFFFFE);  
 }
 
-void SLLIExec   (const Instruction* instr, Hart_state* hart_state)
+void SLLIExec   (const Instruction* instr, HartState* hart_state)
 {
-    hart_state->SetReg(instr->GetRd(), instr->GetRs1() << (instr->GetImm() & 0b11111));
+    SET_R(RDn, RS1v << (IMM & 0b11111));
     PC_incr;
 }
 
-void SRLIExec   (const Instruction* instr, Hart_state* hart_state)
+void SRLIExec   (const Instruction* instr, HartState* hart_state)
 {
-    hart_state->SetReg(instr->GetRd(), instr->GetRs1() >> (instr->GetImm() & 0b11111));
+    SET_R(RDn, RS1v >> (IMM & 0b11111));
     PC_incr;
 }
 
-void SRAIExec   (const Instruction* instr, Hart_state* hart_state)
+void SRAIExec   (const Instruction* instr, HartState* hart_state)
 {
-    uint32_t sb_copy = static_cast<int32_t>(instr->GetImm()) < 0 ? ~(~0u >> instr->GetImm()) : 0;
-    hart_state->SetReg(instr->GetRd(), (hart_state->GetReg(instr->GetRs1()) >> instr->GetImm()) | sb_copy);
+    uint32_t sb_copy = static_cast<int32_t>(IMM) < 0 ? ~(~0u >> instr->GetImm()) : 0;
+    SET_R(RDn, (RS1v >> IMM) | sb_copy);
     PC_incr;
 }
 
-void ADDExec   (const Instruction* instr, Hart_state* hart_state)
+void ADDExec   (const Instruction* instr, HartState* hart_state)
 {
-    hart_state->SetReg(instr->GetRd(), hart_state->GetReg(instr->GetRs1()) + hart_state->GetReg(instr->GetRs2()));
+    SET_R(RDn, RS1v + RS2v);
     PC_incr;
 }
 
-void SUBExec    (const Instruction* instr, Hart_state* hart_state)
+void SUBExec    (const Instruction* instr, HartState* hart_state)
 {
-    hart_state->SetReg(instr->GetRd(), hart_state->GetReg(instr->GetRs1()) - hart_state->GetReg(instr->GetRs2()));
+    SET_R(RDn, RS1v - RS2v);
     PC_incr;
 }
 
-void SLLExec    (const Instruction* instr, Hart_state* hart_state)
+void SLLExec    (const Instruction* instr, HartState* hart_state)
 {
-    hart_state->SetReg(instr->GetRd(), hart_state->GetReg(instr->GetRs1()) << hart_state->GetReg(instr->GetRs2()));
+    SET_R(RDn, RS1v << RS2v);
     PC_incr;
 }
 
-void SLTExec    (const Instruction* instr, Hart_state* hart_state)
+void SLTExec    (const Instruction* instr, HartState* hart_state)
 {
-    static_cast<int32_t>(hart_state->GetReg(instr->GetRs1())) < static_cast<int32_t>(hart_state->GetReg(instr->GetRs2())) ? 
-    hart_state->SetReg(instr->GetRd(), 1):
-    hart_state->SetReg(instr->GetRd(), 0);
+    static_cast<int32_t>(RS1v) < static_cast<int32_t>(RS2v) ? 
+    SET_R(RDn, 1):
+    SET_R(RDn, 0);
     PC_incr;
 }
 
-void SLTUExec   (const Instruction* instr, Hart_state* hart_state)
+void SLTUExec   (const Instruction* instr, HartState* hart_state)
 {
-    hart_state->GetReg(instr->GetRs1()) < hart_state->GetReg(instr->GetRs2()) ? 
-    hart_state->SetReg(instr->GetRd(), 1):
-    hart_state->SetReg(instr->GetRd(), 0);
+    RS1v < RS2v ? 
+    SET_R(RDn, 1):
+    SET_R(RDn, 0);
     PC_incr;
 }
 
-void XORExec    (const Instruction* instr, Hart_state* hart_state)
+void XORExec    (const Instruction* instr, HartState* hart_state)
 {
-    hart_state->SetReg(instr->GetRd(), hart_state->GetReg(instr->GetRs1()) ^ hart_state->GetReg(instr->GetRs2()));
+    SET_R(RDn, RS1v ^ RS2v);
     PC_incr;
 }
 
-void SRLExec    (const Instruction* instr, Hart_state* hart_state)
+void SRLExec    (const Instruction* instr, HartState* hart_state)
 {
-    hart_state->SetReg(instr->GetRd(), hart_state->GetReg(instr->GetRs1()) >> (hart_state->GetReg(instr->GetRs2()) & 0b11111));
+    SET_R(RDn, RS1v >> (RS2v & 0b11111));
     PC_incr;
 }
 
-void SRAExec    (const Instruction* instr, Hart_state* hart_state)
+void SRAExec    (const Instruction* instr, HartState* hart_state)
 {
-    uint8_t offs = hart_state->GetReg(instr->GetRs2()) & 0b11111;
-    uint32_t sb_copy = static_cast<int8_t>(instr->GetRs1()) < 0 ? ~(~0xFFFFFFFF >> offs) : 0; 
-    hart_state->SetReg(instr->GetRd(), (hart_state->GetReg(instr->GetRs1()) >> offs) | sb_copy);
+    uint8_t offs = RS2v & 0b11111;
+    uint32_t sb_copy = static_cast<int8_t>(RS1v) < 0 ? ~(~0xFFFFFFFF >> offs) : 0; 
+    SET_R(RDn, (RS1v >> offs) | sb_copy);
     PC_incr;
 }
 
-void ORExec     (const Instruction* instr, Hart_state* hart_state)
+void ORExec     (const Instruction* instr, HartState* hart_state)
 {
-    hart_state->SetReg(instr->GetRd(), hart_state->GetReg(instr->GetRs1()) | hart_state->GetReg(instr->GetRs2()));
+    SET_R(RDn, RS1v | RS2v);
     PC_incr;
 }
 
-void ANDExec    (const Instruction* instr, Hart_state* hart_state)
+void ANDExec    (const Instruction* instr, HartState* hart_state)
 {
-    hart_state->SetReg(instr->GetRd(), hart_state->GetReg(instr->GetRs1()) & hart_state->GetReg(instr->GetRs2()));
+    SET_R(RDn, RS1v & RS2v);
     PC_incr;
 }
 
-void DUMMYExec  (const Instruction* instr, Hart_state* hart_state)
+void DUMMYExec  (const Instruction* instr, HartState* hart_state)
 {
     printf ("DUMMY instruction\n");
 }
 
-void ECALLExec  (const Instruction* instr, Hart_state* hart_state)
+void ECALLExec  (const Instruction* instr, HartState* hart_state)
 {
     throw HartException ("Finished execution!\n");
+}
+
+void MULExec    (const Instruction* instr, HartState* hart_state)
+{
+    SET_R(RDn, RS1v * RS2v);    
+    PC_incr;
+}
+
+void MULHExec   (const Instruction* instr, HartState* hart_state)
+{
+    SET_R(RDn, ((static_cast<int64_t>(RS1v)*static_cast<int64_t>(RS2v))) >> 32);
+    PC_incr;
+}
+
+void MULHSUExec (const Instruction* instr, HartState* hart_state)
+{
+    SET_R(RDn, ((static_cast<int64_t>(RS1v)*static_cast<uint64_t>RS2v)) >> 32);
+    PC_incr;
+}
+
+void MULHUExec  (const Instruction* instr, HartState* hart_state)
+{
+    SET_R(RDn, (static_cast<uint64_t>RS1v * static_cast<uint64_t>RS2v) >> 32);
+    PC_incr;
+}
+
+void DIVExec    (const Instruction* instr, HartState* hart_state)
+{
+    if (RS2v == 0)
+        throw HartException("Division by zero!\n");
+    SET_R(RDn, static_cast<int32_t>(RS1v) / static_cast<int32_t>(RS2v));
+    PC_incr;
+}
+
+void DIVUExec   (const Instruction* instr, HartState* hart_state)
+{
+    SET_R(RDn, RS2v ? RS1v / RS2v : UINT32_MAX);
+    PC_incr;
+}
+
+void REMExec    (const Instruction* instr, HartState* hart_state)
+{
+    if (RS2v == 0)
+        SET_R(RDn, RS1v);
+    SET_R(RDn, static_cast<int32_t>(RS1v) % static_cast<int32_t>(RS2v));
+    PC_incr;
+}
+
+void REMUExec   (const Instruction* instr, HartState* hart_state)
+{
+    SET_R(RDn, RS2v? RS1v % RS2v : RS1v);
+    PC_incr;
 }
