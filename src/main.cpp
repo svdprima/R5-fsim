@@ -1,6 +1,6 @@
 #include "elf_reader.h"
 #include "decoder.hpp"
-#include "aux.hpp"
+#include "sim.hpp"
 #include <stdio.h>
 
 int main(int argc, char** argv)
@@ -16,25 +16,12 @@ int main(int argc, char** argv)
     ER.Load(words);
 
     PC = ER.Entry();
-    uint32_t n_pages = 50;
+    uint32_t n_pages = 200;
     HartState hart_state(PC, words, n_pages);
     
-    Decoder DCD = Decoder ();
-    Instruction decoded_instr = Instruction ();
+    Sim sim = Sim (hart_state);
     bool is_verbose = true;
-    try
-    {
-        while (true)
-        {
-            decoded_instr = DCD.Decode (hart_state.Fetch(hart_state.GetPc()));
-            decoded_instr.PrintInstr(is_verbose);
-            decoded_instr.Exec_Command (&hart_state);
-        }
-    }
-    catch (HartException &exc)
-    {
-        printf ("%s", exc.what());
-    }
-    hart_state.MemDump();
+    sim.Execute (is_verbose);
+    //hart_state.MemDump();
     return 0;
 }

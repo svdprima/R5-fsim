@@ -1,6 +1,6 @@
 #include "decoder.hpp"
 
-void Instruction::SetCommand (const char* c_name, void (*command) (const Instruction*, HartState*))
+void Instruction::SetCommand (const char* c_name, void (*command) (const Instruction*, const Instruction*, HartState*))
 {
     command_name = c_name;
     cmd = command;
@@ -8,11 +8,11 @@ void Instruction::SetCommand (const char* c_name, void (*command) (const Instruc
 
 Instruction Decoder::Decode (uint32_t raw_instr)
 {
-    printf ("Raw instr is:%x\n", raw_instr);
     Instruction dec_instr = Instruction ();
     dec_instr.SetOppcode (0b1111111 & raw_instr);
+    //printf ("Raw instruction is: %x\n", raw_instr);
    
-    //RV32I Base Instruction Set is currently supported
+    //RV32IM Instruction Set is currently supported
     if ((0b0010100 & dec_instr.GetOppcode()) == 0b0010100)
     {
         dec_instr.type = InstrType::UType; 
@@ -181,12 +181,12 @@ void Instruction::SetImm (uint32_t IMM)
     imm = IMM;
 }
 
-void Instruction::Exec_Command (HartState* hart_state)
+void Instruction::ExecCommand (const Instruction* first_instr, HartState* hart_state) const 
 {
-    cmd (this, hart_state);
+    cmd (first_instr, this, hart_state);
 }
 
-void Instruction::PrintInstr (const bool is_verbose)
+void Instruction::PrintInstr (const bool is_verbose) const
 {
     printf ("%s\n", command_name);
     if (is_verbose)

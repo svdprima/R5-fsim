@@ -65,7 +65,7 @@ private:
     uint8_t rs2;
     uint8_t funct7;
     uint32_t imm;
-    void (*cmd) (const Instruction*, HartState*);
+    void (*cmd) (const Instruction*, const Instruction*, HartState*);
     const char* command_name;
 public:
     InstrType type;
@@ -87,7 +87,7 @@ public:
     uint8_t GetRs2 () const;
     uint8_t GetFunct7 () const;
     uint32_t GetImm () const;
-    void Exec_Command (HartState* hart_state);
+    void ExecCommand (const Instruction* first_instr, HartState* hart_state) const;
     void SetOppcode (uint8_t oppc);
     void SetRd (uint8_t RD);
     void SetFunct3 (uint8_t f3);
@@ -95,14 +95,14 @@ public:
     void SetRs2 (uint8_t RS2);
     void SetFunct7 (uint8_t f7);
     void SetImm (uint32_t IMM);
-    void SetCommand (const char* c_name, void (*command) (const Instruction*, HartState*));
-    void PrintInstr (const bool is_verbose);
+    void SetCommand (const char* c_name, void (*command) (const Instruction*, const Instruction*, HartState*));
+    void PrintInstr (const bool is_verbose) const;
 };
 
 struct CommandDescription
 {
     const char* c_name;
-    void (*exec_command) (const Instruction*, HartState*);
+    void (*exec_command) (const Instruction*, const Instruction*, HartState*);
     Oppcodes oppcode;
     uint8_t funct3 = 0;
     uint8_t funct7 = 0;
@@ -167,15 +167,15 @@ const CommandDescription CommandList [] =
     {"DIVU",  &DIVUExec,  Oppcodes::OP,      0b101, 0x1},
     {"REM",   &REMExec,   Oppcodes::OP,      0b110, 0x1},
     {"REMU",  &REMUExec,  Oppcodes::OP,      0b111, 0x1},
-    {"DUMMY", &DUMMYExec, Oppcodes::UNINIT}
+    {"BASIC", &BASICDUMMY,Oppcodes::UNINIT}
 };
 
 class Decoder
 {
 private:
     std::array <std::vector<CommandDescription>, 256> SortedCommands;
-    const uint8_t oppcode_nu = sizeof(OppcodeType) / sizeof(OppcodeType[0]);
-    const uint8_t cmd_nu     = sizeof(CommandList) / sizeof(CommandList[0]);
+    static constexpr uint8_t oppcode_nu = sizeof(OppcodeType) / sizeof(OppcodeType[0]);
+    static constexpr uint8_t cmd_nu     = sizeof(CommandList) / sizeof(CommandList[0]);
 public:
     Decoder ();
     uint8_t GetOppcodeNu ()
