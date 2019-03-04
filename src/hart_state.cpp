@@ -23,6 +23,11 @@ void HartState::SetSatp(uint32_t satp_value)
 	_MMU.SetSatp(satp_value);
 }
 
+void HartState::PrintSatp()
+{
+    _MMU.PrintSatp();
+}
+
 void HartState::SetReg(uint8_t reg_num, uint32_t reg_value)
 {
 	if(reg_num > 32)

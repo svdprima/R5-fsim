@@ -26,6 +26,7 @@ public:
     void MemDump();
     uint32_t GetPc();
     uint32_t GetSatp();
+    void PrintSatp();
     uint32_t GetReg(uint8_t reg_num);
     uint32_t ReadWord(uint32_t va);
     uint16_t ReadHalfWord(uint32_t va);

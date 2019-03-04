@@ -18,6 +18,9 @@
 #define GET_R(x) (hart_state->GetReg(x));
 #define IMM cur_instr->GetImm()
 #define NEXT_INSTR (cur_instr + 1)->ExecCommand(first_instr, hart_state);
+#define GET_SATP() hart_state->GetSatp()
+#define SET_SATP(x) hart_state->SetSatp(x)
+#define PRINT_SATP hart_state->PrintSatp()
 
 void ADDIExec   (const Instruction* first_instr, const Instruction* cur_instr, HartState* hart_state)
 {
@@ -255,12 +258,12 @@ void ANDExec    (const Instruction* first_instr, const Instruction* cur_instr, H
     NEXT_INSTR;
 }
 
-void DUMMYExec  (const Instruction* first_instr, const Instruction* cur_instr, HartState* hart_state)
+void DUMMYExec  ([[maybe_unused]]const Instruction* first_instr,[[maybe_unused]] const Instruction* cur_instr, [[maybe_unused]]HartState* hart_state)
 {
-    printf ("DUMMY instruction\n");
+    throw HartException("DUMMY instruction\n");
 }
 
-void ECALLExec  (const Instruction* first_instr, const Instruction* cur_instr, HartState* hart_state)
+void ECALLExec  ([[maybe_unused]]const Instruction* first_instr, [[maybe_unused]]const Instruction* cur_instr, [[maybe_unused]]HartState* hart_state)
 {
     throw HartException ("Finished execution!\n");
 }
@@ -320,4 +323,58 @@ void REMUExec   (const Instruction* first_instr, const Instruction* cur_instr, H
 void BASICDUMMY (const Instruction* first_instr, const Instruction* cur_instr, HartState* hart_state)
 {
     SET_PC (GET_PC() + (cur_instr - first_instr - 1) * 4);
+}
+
+void CSRRWExec  (const Instruction* first_instr, const Instruction* cur_instr, HartState* hart_state)
+{
+    if (IMM != 0x180)
+        throw HartException("Only SATP system register is supported!\n");
+    SET_R(RDn, GET_SATP());
+    SET_SATP(RS1v);
+    NEXT_INSTR;
+}
+
+void CSRRSExec  (const Instruction* first_instr, const Instruction* cur_instr, HartState* hart_state)
+{
+    if (IMM != 0x180)
+        throw HartException("Only SATP system register is supported!\n");
+    SET_R(RDn, GET_SATP());
+    SET_SATP(GET_SATP() | RS1v);
+    NEXT_INSTR;
+}
+
+void CSRRCExec  (const Instruction* first_instr, const Instruction* cur_instr, HartState* hart_state)
+{
+    if (IMM != 0x180)
+        throw HartException("Only SATP system register is supported!\n");
+    SET_R(RDn, GET_SATP());
+    SET_SATP(GET_SATP() | (!RS1v));
+    NEXT_INSTR;
+}
+
+void CSRRWIExec (const Instruction* first_instr, const Instruction* cur_instr, HartState* hart_state)
+{
+    if (IMM != 0x180)
+        throw HartException("Only SATP system register is supported!\n");
+    SET_R(RDn, GET_SATP());
+    SET_SATP(static_cast<uint32_t>(RS1n)); //the uimm is formally in rs1 field of I-TYPE instr
+    NEXT_INSTR;
+}
+
+void CSRRSIExec (const Instruction* first_instr, const Instruction* cur_instr, HartState* hart_state)
+{
+    if (IMM != 0x180)
+        throw HartException("Only SATP system register is supported!\n");
+    SET_R(RDn, GET_SATP());
+    SET_SATP(GET_SATP() | static_cast<uint32_t>(RS1n));
+    NEXT_INSTR;
+}
+
+void CSRRCIExec (const Instruction* first_instr, const Instruction* cur_instr, HartState* hart_state)
+{
+    if (IMM != 0x180)
+        throw HartException("Only SATP system register is supported!\n");
+    SET_R(RDn, GET_SATP());
+    SET_SATP(GET_SATP() | (!static_cast<uint32_t>(RS1n)));
+    NEXT_INSTR;
 }

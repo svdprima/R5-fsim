@@ -46,6 +46,7 @@ public:
     uint16_t ReadHalfWord(uint64_t pa);
     uint8_t ReadByte(uint64_t pa);
     uint32_t GetSatp();
+    void PrintSatp();
     uint64_t Translate(uint32_t va, AccessType access);
     ~MMU() {}
 };

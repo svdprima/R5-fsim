@@ -1,4 +1,5 @@
 #include "mmu.h"
+#include "aux.h"
 
 MMU::MMU(std::vector<uint32_t> &words, uint32_t n_pages)
 {
@@ -96,6 +97,10 @@ uint32_t MMU::GetSatp()
 	return satp;
 }
 
+void MMU::PrintSatp()
+{
+    printf ("SATP is %x\n", satp);
+}
 
 
 uint64_t MMU::Translate(uint32_t va, AccessType access)

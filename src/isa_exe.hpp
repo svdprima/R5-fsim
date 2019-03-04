@@ -52,12 +52,12 @@ void ANDExec    (const Instruction* first_instr, const Instruction* cur_instr, H
 //void FENCEIExec (const Instruction* first_instr, const Instruction* cur_instr, HartState* hart_state);
 void ECALLExec  (const Instruction* first_instr, const Instruction* cur_instr, HartState* hart_state);
 //void EBREAKExec (const Instruction* first_instr, const Instruction* cur_instr, HartState* hart_state);
-//void CSRRWExec  (const Instruction* first_instr, const Instruction* cur_instr, HartState* hart_state);
-//void CSRRSExec  (const Instruction* first_instr, const Instruction* cur_instr, HartState* hart_state);
-//void CSRRCExec  (const Instruction* first_instr, const Instruction* cur_instr, HartState* hart_state);
-//void CSRRWIExec (const Instruction* first_instr, const Instruction* cur_instr, HartState* hart_state);
-//void CSRRSIExec (const Instruction* first_instr, const Instruction* cur_instr, HartState* hart_state);
-//void CSRRCIExec (const Instruction* first_instr, const Instruction* cur_instr, HartState* hart_state);
+void CSRRWExec  (const Instruction* first_instr, const Instruction* cur_instr, HartState* hart_state);
+void CSRRSExec  (const Instruction* first_instr, const Instruction* cur_instr, HartState* hart_state);
+void CSRRCExec  (const Instruction* first_instr, const Instruction* cur_instr, HartState* hart_state);
+void CSRRWIExec (const Instruction* first_instr, const Instruction* cur_instr, HartState* hart_state);
+void CSRRSIExec (const Instruction* first_instr, const Instruction* cur_instr, HartState* hart_state);
+void CSRRCIExec (const Instruction* first_instr, const Instruction* cur_instr, HartState* hart_state);
 void BASICDUMMY (const Instruction* first_instr, const Instruction* cur_instr, HartState* hart_state);
 void DUMMYExec  (const Instruction* first_instr, const Instruction* cur_instr, HartState* hart_state);
 
