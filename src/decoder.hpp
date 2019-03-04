@@ -151,12 +151,12 @@ const CommandDescription CommandList [] =
     //{"FENCEI",&FENCEIExec,Oppcodes::MISC-MEM,0b001},
     {"ECALL", &ECALLExec, Oppcodes::SYSTEM},
     //{"EBREAK",&EBREAKExec,Oppcodes::SYSTEM,  0b000, 0b1}, //not a funct7, but the entire imm
-    //{"CSRRW", &CSRRWExec, Oppcodes::SYSTEM,  0b001},
-    //{"CSRRS", &CSRRSExec, Oppcodes::SYSTEM,  0b010},
-    //{"CSRRC", &CSRRCExec, Oppcodes::SYSTEM,  0b011},
-    //{"CSRRWI",&CSRRWIExec,Oppcodes::SYSTEM,  0b101},
-    //{"CSRRSI",&CSRRSIExec,Oppcodes::SYSTEM,  0b110},
-    //{"CSRRCI",&CSRRCIExec,Oppcodes::SYSTEM,  0b111}    
+    {"CSRRW", &CSRRWExec, Oppcodes::SYSTEM,  0b001},
+    {"CSRRS", &CSRRSExec, Oppcodes::SYSTEM,  0b010},
+    {"CSRRC", &CSRRCExec, Oppcodes::SYSTEM,  0b011},
+    {"CSRRWI",&CSRRWIExec,Oppcodes::SYSTEM,  0b101},
+    {"CSRRSI",&CSRRSIExec,Oppcodes::SYSTEM,  0b110},
+    {"CSRRCI",&CSRRCIExec,Oppcodes::SYSTEM,  0b111}, 
 
     {"DUMMY", &DUMMYExec, Oppcodes::UNINIT},
     {"MUL",   &MULExec,   Oppcodes::OP,      0b000, 0x1},

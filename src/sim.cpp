@@ -36,10 +36,11 @@ BasicBlock::BasicBlock (HartState &h_state, Decoder &DCD)
         instructions[i] = DCD.Decode(h_state.Fetch(h_state.GetPc() + 4 * i)); 
         i++;
     }
-    while ((i < block_size) && instructions.at(i - 1).GetOppcode() != 0b1101111
-                            && instructions.at(i - 1).GetOppcode() != 0b1100111
-                            && instructions.at(i - 1).GetOppcode() != 0b1100011
-                            && instructions.at(i - 1).GetOppcode() != 0b1110011);
+    while ((i < block_size) &&  instructions.at(i - 1).GetOppcode() != 0b1101111
+                            &&  instructions.at(i - 1).GetOppcode() != 0b1100111
+                            &&  instructions.at(i - 1).GetOppcode() != 0b1100011
+                            && (instructions.at(i - 1).GetOppcode() != 0b1110011
+                            ||  instructions.at(i - 1).GetFunct3()));
     instructions[block_size].SetCommand("BASIC", &BASICDUMMY);
 }
 

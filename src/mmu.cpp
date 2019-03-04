@@ -1,5 +1,5 @@
 #include "mmu.h"
-#include "aux.h"
+#include "aux.hpp"
 
 MMU::MMU(std::vector<uint32_t> &words, uint32_t n_pages)
 {
