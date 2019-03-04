@@ -158,5 +158,10 @@ uint64_t MMU::Translate(uint32_t va, AccessType access)
 	}
 	else
 		pa |= (uint64_t)(pte & 0xfffffc00) << 2;
+
+	pte |= A_bit;
+	if(access == WRITE)
+		pte |= D_bit;
+
 	return pa;
 }
