@@ -10,7 +10,7 @@ Instruction Decoder::Decode (uint32_t raw_instr)
 {
     Instruction dec_instr = Instruction ();
     dec_instr.SetOppcode (0b1111111 & raw_instr);
-    //printf ("Raw instruction is: %x\n", raw_instr);
+    //printf ("Raw instruction is: %08x\n", raw_instr);
    
     //RV32IM Instruction Set is currently supported
     if ((0b0010100 & dec_instr.GetOppcode()) == 0b0010100)

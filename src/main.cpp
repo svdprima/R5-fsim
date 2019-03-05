@@ -22,6 +22,5 @@ int main(int argc, char** argv)
     Sim sim = Sim (hart_state);
     bool is_verbose = true;
     sim.Execute (is_verbose);
-    //hart_state.MemDump();
     return 0;
 }

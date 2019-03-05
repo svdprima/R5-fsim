@@ -13,8 +13,8 @@ class HartState
 private:
     uint32_t pc;
     uint32_t regs[32];
+    uint32_t cmd_counter;
     MMU _MMU;
-
 public:
     HartState(uint32_t initial_pc, std::vector<uint32_t> &words, uint32_t n_pages);
     void SetPc(uint32_t pc_value);
@@ -35,6 +35,8 @@ public:
 	void PrintPc();
 	void PrintReg(uint32_t reg_num);
     void PrintWord(uint32_t va);
+    void IncreaseCmdCount(uint32_t incr);
+    uint32_t GetCmdCount ();
     ~HartState() {}
 };
 

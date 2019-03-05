@@ -3,6 +3,8 @@
 
 #include <exception>
 
+#define MAX_INSTR 1000000
+
 class HartException: public std::exception
 {
 private:

@@ -10,18 +10,17 @@ void Sim::Execute (bool is_verbose)
         while (true)
         {
 
-            /*
-            dec_instr = DCD.Decode(hart_state.Fetch(hart_state.GetPc()));
-            //dec_instr.PrintInstr(verbose);
-            dec_instr.ExecCommand (&hart_state);
-            */
             BasicBlock BB = BasicBlock (hart_state, DCD);
             BB.ExecuteBlock (hart_state);
+            if (hart_state.GetCmdCount() >= MAX_INSTR)
+                break;
         }
     }
     catch (HartException &exc)
     {
         printf ("%s", exc.what());
+        printf ("%u instructions executed\n", hart_state.GetCmdCount());
+        hart_state.MemDump();
     }
     std::chrono::high_resolution_clock::time_point t_finish = std::chrono::high_resolution_clock::now();
     std::chrono::duration<double> ex_time = std::chrono::duration_cast<std::chrono::duration<double>>(t_finish - t_start);

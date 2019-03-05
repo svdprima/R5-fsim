@@ -17,10 +17,14 @@
 #define SET_R(x, val) (hart_state->SetReg(x, val))
 #define GET_R(x) (hart_state->GetReg(x));
 #define IMM cur_instr->GetImm()
-#define NEXT_INSTR (cur_instr + 1)->ExecCommand(first_instr, hart_state);
+#define NEXT_INSTR \ 
+{ \ 
+    (cur_instr + 1)->ExecCommand(first_instr, hart_state); \
+}
 #define GET_SATP() hart_state->GetSatp()
 #define SET_SATP(x) hart_state->SetSatp(x)
 #define PRINT_SATP hart_state->PrintSatp()
+#define CMD_incr(x) hart_state->IncreaseCmdCount(x)
 
 void ADDIExec   (const Instruction* first_instr, const Instruction* cur_instr, HartState* hart_state)
 {
@@ -124,6 +128,7 @@ void BEQExec    (const Instruction* first_instr, const Instruction* cur_instr, H
     RS1v == RS2v ?
     SET_PC(GET_PC() + (cur_instr - first_instr) * 4 + (IMM << 1)) : 
     SET_PC(GET_PC() + (cur_instr - first_instr + 1) * 4); 
+    CMD_incr(cur_instr - first_instr + 1);
 }
 
 void BNEExec    (const Instruction* first_instr, const Instruction* cur_instr, HartState* hart_state)
@@ -131,6 +136,7 @@ void BNEExec    (const Instruction* first_instr, const Instruction* cur_instr, H
     RS1v != RS2v ?
     SET_PC(GET_PC() + (cur_instr - first_instr) * 4 + (IMM << 1)) : 
     SET_PC(GET_PC() + (cur_instr - first_instr + 1) * 4); 
+    CMD_incr(cur_instr - first_instr + 1);
 }
 
 void BLTExec    (const Instruction* first_instr, const Instruction* cur_instr, HartState* hart_state)
@@ -138,6 +144,7 @@ void BLTExec    (const Instruction* first_instr, const Instruction* cur_instr, H
     static_cast<int32_t>(RS1v) < static_cast<int32_t>(RS2v) ?
     SET_PC(GET_PC() + (cur_instr - first_instr) * 4 + (IMM << 1)) :
     SET_PC(GET_PC() + (cur_instr - first_instr + 1) * 4); 
+    CMD_incr(cur_instr - first_instr + 1);
 }
 
 void BGEExec    (const Instruction* first_instr, const Instruction* cur_instr, HartState* hart_state)
@@ -145,6 +152,7 @@ void BGEExec    (const Instruction* first_instr, const Instruction* cur_instr, H
     static_cast<int32_t>(RS1v) >= static_cast<int32_t>(RS2v) ? 
     SET_PC(GET_PC() + (cur_instr - first_instr) * 4 + (static_cast<int32_t>(IMM) << 1)) :
     SET_PC(GET_PC() + (cur_instr - first_instr + 1) * 4); 
+    CMD_incr(cur_instr - first_instr + 1);
 }
 
 void BLTUExec   (const Instruction* first_instr, const Instruction* cur_instr, HartState* hart_state)
@@ -152,6 +160,7 @@ void BLTUExec   (const Instruction* first_instr, const Instruction* cur_instr, H
     RS1v < RS2v ? 
     SET_PC(GET_PC() + (cur_instr - first_instr) * 4 + (IMM << 1)) :
     SET_PC(GET_PC() + (cur_instr - first_instr + 1) * 4); 
+    CMD_incr(cur_instr - first_instr + 1);
 }
 
 void BGEUExec   (const Instruction* first_instr, const Instruction* cur_instr, HartState* hart_state)
@@ -159,18 +168,21 @@ void BGEUExec   (const Instruction* first_instr, const Instruction* cur_instr, H
     RS1v > RS2v ?
     SET_PC(GET_PC() + (cur_instr - first_instr) * 4 + (IMM << 1)) :
     SET_PC(GET_PC() + (cur_instr - first_instr + 1) * 4); 
+    CMD_incr(cur_instr - first_instr + 1);
 }
 
 void JALExec    (const Instruction* first_instr, const Instruction* cur_instr, HartState* hart_state)
 {
     SET_R(RDn, GET_PC() + 4 + (cur_instr - first_instr) * 4);
     SET_PC(GET_PC() + (cur_instr - first_instr) * 4 + (static_cast<int32_t>(IMM) << 1));
+    CMD_incr(cur_instr - first_instr + 1);
 }
 
 void JALRExec   (const Instruction* first_instr, const Instruction* cur_instr, HartState* hart_state)
 {
     SET_R(RDn, GET_PC() + (cur_instr - first_instr) * 4 + 4);
     SET_PC((RS1v + IMM) & 0xFFFFFFFE);  
+    CMD_incr(cur_instr - first_instr + 1);
 }
 
 void SLLIExec   (const Instruction* first_instr, const Instruction* cur_instr, HartState* hart_state)
@@ -322,7 +334,8 @@ void REMUExec   (const Instruction* first_instr, const Instruction* cur_instr, H
 
 void BASICDUMMY (const Instruction* first_instr, const Instruction* cur_instr, HartState* hart_state)
 {
-    SET_PC (GET_PC() + (cur_instr - first_instr - 1) * 4);
+    SET_PC (GET_PC() + (cur_instr - first_instr) * 4);
+    CMD_incr(cur_instr - first_instr + 1);
 }
 
 void CSRRWExec  (const Instruction* first_instr, const Instruction* cur_instr, HartState* hart_state)

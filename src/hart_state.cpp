@@ -1,7 +1,7 @@
 #include "hart_state.h"
 
 HartState::HartState(uint32_t initial_pc, std::vector<uint32_t> &words, uint32_t n_pages) 
-: _MMU(words, n_pages)
+: cmd_counter(0), _MMU(words, n_pages)
 {
 	pc = initial_pc;
 	for(int i = 0; i < 32; ++i)
@@ -115,4 +115,14 @@ void HartState::PrintReg(uint32_t reg_num)
 void HartState::PrintWord(uint32_t va)
 {
     printf ("Word at specified adress: %x\n", ReadWord(va));
+}
+
+void HartState::IncreaseCmdCount(uint32_t incr)
+{
+    cmd_counter += incr;
+}
+
+uint32_t HartState::GetCmdCount()
+{
+    return cmd_counter;
 }
