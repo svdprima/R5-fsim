@@ -9,7 +9,7 @@ HartState::HartState(uint32_t initial_pc, std::vector<uint32_t> &words, uint32_t
 		if (i != 2)
 			regs[i] = 0;
 		else
-			regs[i] = 0x4fff; //initialising stack pointer
+			regs[i] = 0x4ffc; //initialising stack pointer
 	}
 }
 

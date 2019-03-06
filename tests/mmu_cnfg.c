@@ -26,7 +26,7 @@ void FirstLevelPtCnfg(uint32_t vpn, uint32_t ppn, Pte_t pte_type)
 	uint32_t satp;
 	uint32_t* first_level_pte; // should be 34bit
 	asm("csrrs %[dest], satp, x0" : [dest] "=r" (satp)); // read satp
-	first_level_pte = (uint32_t*)(((satp & 0x003fffff) << 12) + (vpn >> 8));
+	first_level_pte = (uint32_t*)(((satp & 0x003fffff) << 12) + ((vpn >> 10)) << 2);
 	*first_level_pte = (ppn << 10) | (0b1111 << 4) | (pte_type << 1) | 0b1;
 }
 
@@ -38,16 +38,12 @@ void SecondLevelPtCnfg(uint32_t vpn, uint32_t ppn, Pte_t pte_type)
 	uint32_t* first_level_pte;  // should be 34bit
 	uint32_t* second_level_pte; // should be 34bit
 	asm("csrrs %[dest], satp, x0" : [dest] "=r" (satp)); // read satp
-	first_level_pte = (uint32_t*)(((satp & 0x003fffff) << 12) + (vpn >> 8));
+	first_level_pte = (uint32_t*)(((satp & 0x003fffff) << 12) + ((vpn >> 10)) << 2);
 	if(((*first_level_pte >> 1) & 0b111) != next_level)
 		return;
-	second_level_pte = (uint32_t*)(((*first_level_pte & 0xfffffc00) << 2)
+	second_level_pte = (uint32_t*)(((*first_level_pte & 0xfffffc00) << 2) 
 						+ ((vpn & 0x3ff) << 2));
 	*second_level_pte = (ppn << 10) | (0b1111 << 4) | (pte_type << 1) | 0b1;
-	//*second_level_pte |= (pte_type t<< 1);
-	*(uint32_t*)0x4 = (ppn << 10);
-	*(uint32_t*)0x8 = (pte_type << 1);
-	*(uint32_t*)0xc = *second_level_pte;
 }
 
 void EnableTranslation()
@@ -69,14 +65,25 @@ void DisableTranslation()
 int main()
 {
 	SetRootPPN(0x0);
-	FirstLevelPtCnfg(0x10, 0x1, next_level);
-	//SecondLevelPtCnfg(0x10, 0x10, x_only); // for main
-	SecondLevelPtCnfg(0x4, 0x4, r_w); // for stack
-	//SecondLevelPtCnfg(0x20, 0x9, r_w_x);
-	//EnableTranslation();
 
-	//*(uint32_t*)0x20100 = 0x12345678;
+	FirstLevelPtCnfg(0x10, 0x1, next_level);
+	SecondLevelPtCnfg(0x10, 0x10, x_only); // for current code
+	SecondLevelPtCnfg(0x11, 0x11, r_w);    // for 0x11c98
+	SecondLevelPtCnfg(0x4, 0x4, r_w); // for stack
+
+	FirstLevelPtCnfg(0x100f, 0x2, next_level);
+	SecondLevelPtCnfg(0x100f, 0x9, r_w);
+
+	FirstLevelPtCnfg(0x80200, 0x3, next_level);
+	SecondLevelPtCnfg(0x80200, 0x9, r_only);
+
+	EnableTranslation();
 	
+
+	*(uint32_t*)0x0100faaa = 0xdeadbeef;
+	if(*(uint32_t*)0x80200aaa != 0xdeadbeef)
+		while(1) {}
+
 
 	return 0;
 }

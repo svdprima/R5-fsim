@@ -48,7 +48,7 @@ uint32_t Elf_reader::Entry()
 
 void Elf_reader::Load(std::vector<uint32_t> &words)
 {
-	uint32_t mem_end;
+	uint32_t mem_end = 0;
 	if(n_ph > 0)
 		mem_end = phdrs[0].p_vaddr + phdrs[0].p_memsz;
 	for(size_t i = 0; i < n_ph; i++)
