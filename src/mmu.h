@@ -43,7 +43,8 @@ public:
     };
 
     MMU(std::vector<uint32_t> &words, uint32_t n_pages);
-    void WriteWord(uint64_t pa, uint32_t data)
+    
+    void WriteWordPhys(uint64_t pa, uint32_t data)
     {
         if(pa+3 > max_pa)
             errx(EXIT_FAILURE, "Out of physical memory, pa - %#010lx.", pa);
@@ -52,7 +53,28 @@ public:
         else
             errx(EXIT_FAILURE, "Unaligned word access, pa - %#010lx.", pa);
     }
-    void WriteHalfWord(uint64_t pa, uint16_t data)
+    void WriteWord(uint32_t va, uint32_t data)
+    {
+        uint64_t pa;
+        if(satp >> 31 == 0)
+            pa = (uint64_t)va;
+        else
+        {
+            try
+            {
+                pa = (W_TLB.get(va >> 12) << 12) | (va & 0xfff);
+            }
+            catch (std::range_error)
+            {
+                pa = Translate(va, WRITE);
+                W_TLB.put(va >> 12, pa >> 12);
+            }
+        }
+
+        WriteWordPhys(pa, data);
+    }
+
+    void WriteHalfWordPhys(uint64_t pa, uint16_t data)
     {
         if(pa+1 > max_pa)
             errx(EXIT_FAILURE, "Out of physical memory, pa - %#010lx.", pa);
@@ -64,9 +86,29 @@ public:
         }
         else
             errx(EXIT_FAILURE, "Unaligned half word access, pa - %#010lx.", pa);
-        
     }
-    void WriteByte(uint64_t pa, uint8_t data)
+    void WriteHalfWord(uint32_t va, uint32_t data)
+    {
+        uint64_t pa;
+        if(satp >> 31 == 0)
+            pa = (uint64_t)va;
+        else
+        {
+            try
+            {
+                pa = (W_TLB.get(va >> 12) << 12) | (va & 0xfff);
+            }
+            catch (std::range_error)
+            {
+                pa = Translate(va, WRITE);
+                W_TLB.put(va >> 12, pa >> 12);
+            }
+        }
+
+        WriteHalfWordPhys(pa, data);
+    }
+
+    void WriteBytePhys(uint64_t pa, uint8_t data)
     {
         if(pa > max_pa)
             errx(EXIT_FAILURE, "Out of physical memory, pa - %#010lx.", pa);
@@ -74,12 +116,34 @@ public:
         mem[pa>>2] = (mem[pa>>2] & ~(0xff << offset_in_word))
                         | ((uint32_t)data << offset_in_word);
     }
+    void WriteByte(uint32_t va, uint32_t data)
+    {
+        uint64_t pa;
+        if(satp >> 31 == 0)
+            pa = (uint64_t)va;
+        else
+        {
+            try
+            {
+                pa = (W_TLB.get(va >> 12) << 12) | (va & 0xfff);
+            }
+            catch (std::range_error)
+            {
+                pa = Translate(va, WRITE);
+                W_TLB.put(va >> 12, pa >> 12);
+            }
+        }
+
+        WriteBytePhys(pa, data);
+    }
+
     void SetSatp(uint32_t satp_value)
     {
         satp = satp_value;
     }
     void MemDump();
-    uint32_t ReadWord(uint64_t pa)
+
+    uint32_t ReadWordPhys(uint64_t pa)
     {
         if(pa+3 > max_pa)
             errx(EXIT_FAILURE, "Out of physical memory, pa - %#010lx.", pa);
@@ -88,7 +152,48 @@ public:
         else
             errx(EXIT_FAILURE, "Unaligned word access, pa - %#010lx.", pa);
     }
-    uint16_t ReadHalfWord(uint64_t pa)
+    uint32_t ReadWord(uint32_t va)
+    {
+        uint64_t pa;
+        if(satp >> 31 == 0)
+            pa = (uint64_t)va;
+        else
+        {
+            try
+            {
+                pa = (R_TLB.get(va >> 12) << 12) | (va & 0xfff);
+            }
+            catch (std::range_error)
+            {
+                pa = Translate(va, READ);
+                R_TLB.put(va >> 12, pa >> 12);
+            }
+        }
+
+        return ReadWordPhys(pa);
+    }
+    uint32_t Fetch(uint32_t va)
+    {
+        uint64_t pa;
+        if(satp >> 31 == 0)
+            pa = (uint64_t)va;
+        else
+        {
+            try
+            {
+                pa = (X_TLB.get(va >> 12) << 12) | (va & 0xfff);
+            }
+            catch (std::range_error)
+            {
+                pa = Translate(va, EXEC);
+                X_TLB.put(va >> 12, pa >> 12);
+            }
+        }
+
+        return ReadWordPhys(pa);
+    }
+
+    uint16_t ReadHalfWordPhys(uint64_t pa)
     {
         if(pa+1 > max_pa)
             errx(EXIT_FAILURE, "Out of physical memory, pa - %#010lx.", pa);
@@ -100,13 +205,55 @@ public:
         else
             errx(EXIT_FAILURE, "Unaligned half word access, pa - %#010lx.", pa);
     }
-    uint8_t ReadByte(uint64_t pa)
+    uint16_t ReadHalfWord(uint32_t va)
+    {
+        uint64_t pa;
+        if(satp >> 31 == 0)
+            pa = (uint64_t)va;
+        else
+        {
+            try
+            {
+                pa = (R_TLB.get(va >> 12) << 12) | (va & 0xfff);
+            }
+            catch (std::range_error)
+            {
+                pa = Translate(va, READ);
+                R_TLB.put(va >> 12, pa >> 12);
+            }
+        }
+
+        return ReadHalfWordPhys(pa);
+    }
+
+    uint8_t ReadBytePhys(uint64_t pa)
     {
         if(pa > max_pa)
             errx(EXIT_FAILURE, "Out of physical memory, pa - %#010lx.", pa);
         uint32_t offset_in_word = (pa & 0b11) * 8;
         return (mem[pa>>2] >> offset_in_word) & 0xff;
     }
+    uint8_t ReadByte(uint32_t va)
+    {
+        uint64_t pa;
+        if(satp >> 31 == 0)
+            pa = (uint64_t)va;
+        else
+        {
+            try
+            {
+                pa = (R_TLB.get(va >> 12) << 12) | (va & 0xfff);
+            }
+            catch (std::range_error)
+            {
+                pa = Translate(va, READ);
+                R_TLB.put(va >> 12, pa >> 12);
+            }
+        }
+
+        return ReadBytePhys(pa);
+    }
+
     uint32_t GetSatp()
     {
         return satp;

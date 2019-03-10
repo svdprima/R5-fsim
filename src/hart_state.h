@@ -45,18 +45,15 @@ public:
     }
     void WriteWord(uint32_t va, uint32_t data)
     {
-        uint64_t pa = _MMU.Translate(va, MMU::AccessType::WRITE);
-        _MMU.WriteWord(pa, data);
+        _MMU.WriteWord(va, data);
     }
     void WriteHalfWord(uint32_t va, uint16_t data)
     {
-        uint64_t pa = _MMU.Translate(va, MMU::AccessType::WRITE);
-        _MMU.WriteHalfWord(pa, data);
+        _MMU.WriteHalfWord(va, data);
     }
     void WriteByte(uint32_t va, uint8_t data)
     {
-        uint64_t pa = _MMU.Translate(va, MMU::AccessType::WRITE);
-        _MMU.WriteByte(pa, data);
+        _MMU.WriteByte(va, data);
     }
     void MemDump()
     {
@@ -78,23 +75,19 @@ public:
     }
     uint32_t ReadWord(uint32_t va)
     {
-        uint64_t pa = _MMU.Translate(va, MMU::AccessType::READ);
-        return _MMU.ReadWord(pa);
+        return _MMU.ReadWord(va);
     }
     uint16_t ReadHalfWord(uint32_t va)
     {
-        uint64_t pa = _MMU.Translate(va, MMU::AccessType::READ);
-        return _MMU.ReadHalfWord(pa);
+        return _MMU.ReadHalfWord(va);
     }
     uint8_t ReadByte(uint32_t va)
     {
-        uint64_t pa = _MMU.Translate(va, MMU::AccessType::READ);
-        return _MMU.ReadByte(pa);
+        return _MMU.ReadByte(va);
     }
     uint32_t Fetch(uint32_t va)
     {
-        uint64_t pa = _MMU.Translate(va, MMU::AccessType::EXEC);
-        return _MMU.ReadWord(pa);
+        return _MMU.Fetch(va);
     }
 	void PrintPc()
     {

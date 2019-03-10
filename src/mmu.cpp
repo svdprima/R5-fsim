@@ -19,7 +19,7 @@ MMU::MMU(std::vector<uint32_t> &words, uint32_t n_pages)
 void MMU::MemDump()
 {
 	std::ofstream fout("./mem_dump.bin", std::ios::out | std::ios::binary);
-	fout.write((char*)&mem[0], mem.size() * sizeof(uint8_t));
+	fout.write((char*)&mem[0], mem.size() * sizeof(uint32_t));
 	fout.close();
 }
 
@@ -27,93 +27,55 @@ void MMU::MemDump()
 
 uint64_t MMU::Translate(uint32_t va, AccessType access)
 {
-	if(satp >> 31 == 0)
-		return (uint64_t)va;
+	uint64_t a = (satp & 0x003fffff) * PAGESIZE;
+	int i = LEVELS - 1;
+	uint64_t pte_addr;
+	uint32_t pte;
 
-	uint64_t pa = (uint64_t)va & 0xfff;
-	try
+	while(1)
 	{
-		switch (access)
-		{
-		case READ:
-			pa |= R_TLB.get(va >> 12) << 12;
+		pte_addr = a + (i ? va >> 22 : ((va << 10) >> 22)) * PTESIZE;
+		pte = ReadWordPhys(pte_addr);
+
+		if((pte & V_bit) == 0)
+	        errx(EXIT_FAILURE, "page fault (invalid), pte - %#010x, pte_addr - %#010lx.", pte, pte_addr);
+
+		if(((pte & R_bit) == 0) && ((pte & W_bit) == W_bit))
+			errx(EXIT_FAILURE, "page fault (W, but not R), pte - %#010x, pte_addr - %#010lx.", pte, pte_addr);
+
+		if(((pte & R_bit) == R_bit) || ((pte & X_bit) == X_bit))
 			break;
-		case WRITE:
-			pa |= W_TLB.get(va >> 12) << 12;
-			break;
-		case EXEC:
-			pa |= X_TLB.get(va >> 12) << 12;
-			break;
-		}
+
+		i = i - 1;
+		if(i < 0)
+			errx(EXIT_FAILURE, "page fault (i<0), pte - %#010x, pte_addr - %#010lx.", pte, pte_addr);
+		
+		a = (uint64_t)(pte >> 10) * PAGESIZE;
 	}
-	catch (std::range_error)
+	
+	//leaf PTE has been found
+	if((access == READ 	&& (pte & R_bit) == 0) || 
+	   (access == WRITE	&& (pte & W_bit) == 0) || 
+	   (access == EXEC 	&& (pte & X_bit) == 0))
+		errx(EXIT_FAILURE, "page fault (access type), pte - %#010x, pte_addr - %#010lx.", pte, pte_addr);
+
+	if((i > 0) && (((pte >> 10) & 0x3ff) != 0))
+		errx(EXIT_FAILURE, "page fault (superpage), pte - %#010x, pte_addr - %#010lx.", pte, pte_addr);
+
+	if((pte & A_bit) == 0)
+		errx(EXIT_FAILURE, "page fault (access bit), pte - %#010x, pte_addr - %#010lx.", pte, pte_addr);
+	
+	if((access == WRITE) && ((pte & D_bit) == 0))
+		errx(EXIT_FAILURE, "page fault (dirty bit), pte - %#010x, pte_addr - %#010lx.", pte, pte_addr);
+
+	uint64_t pa = va & 0xfff;
+	if(i > 0)
 	{
-		uint64_t a = (satp & 0x003fffff) * PAGESIZE;
-		int i = LEVELS - 1;
-		uint64_t pte_addr;
-		uint32_t pte;
-
-		while(1)
-		{
-			pte_addr = a + (i ? va >> 22 : ((va << 10) >> 22)) * PTESIZE;
-			pte = ReadWord(pte_addr);
-
-			if((pte & V_bit) == 0)
-		        errx(EXIT_FAILURE, "page fault (invalid), pte - %#010x, pte_addr - %#010lx.", pte, pte_addr);
-
-			if(((pte & R_bit) == 0) && ((pte & W_bit) == W_bit))
-				errx(EXIT_FAILURE, "page fault (W, but not R), pte - %#010x, pte_addr - %#010lx.", pte, pte_addr);
-
-			if(((pte & R_bit) == R_bit) || ((pte & X_bit) == X_bit))
-				break;
-
-			i = i - 1;
-			if(i < 0)
-				errx(EXIT_FAILURE, "page fault (i<0), pte - %#010x, pte_addr - %#010lx.", pte, pte_addr);
-			
-			a = (uint64_t)(pte >> 10) * PAGESIZE;
-		}
-		
-		//leaf PTE has been found
-		if((access == READ 	&& (pte & R_bit) == 0) || 
-		   (access == WRITE	&& (pte & W_bit) == 0) || 
-		   (access == EXEC 	&& (pte & X_bit) == 0))
-			errx(EXIT_FAILURE, "page fault (access type), pte - %#010x, pte_addr - %#010lx.", pte, pte_addr);
-
-		if((i > 0) && (((pte >> 10) & 0x3ff) != 0))
-			errx(EXIT_FAILURE, "page fault (superpage), pte - %#010x, pte_addr - %#010lx.", pte, pte_addr);
-
-		if((pte & A_bit) == 0)
-			errx(EXIT_FAILURE, "page fault (access bit), pte - %#010x, pte_addr - %#010lx.", pte, pte_addr);
-		
-		if((access == WRITE) && ((pte & D_bit) == 0))
-			errx(EXIT_FAILURE, "page fault (dirty bit), pte - %#010x, pte_addr - %#010lx.", pte, pte_addr);
-
-		if(i > 0)
-		{
-			pa |= va & 0x3ff000;
-			pa |= (uint64_t)(pte & 0xfff00000) << 2;
-		}
-		else
-			pa |= (uint64_t)(pte & 0xfffffc00) << 2;
-
-		pte |= A_bit;
-		if(access == WRITE)
-			pte |= D_bit;
-
-		switch (access)
-		{
-		case READ:
-			R_TLB.put(va >> 12, pa >> 12);
-			break;
-		case WRITE:
-			W_TLB.put(va >> 12, pa >> 12);
-			break;
-		case EXEC:
-			X_TLB.put(va >> 12, pa >> 12);
-			break;
-		}
+		pa |= va & 0x3ff000;
+		pa |= (uint64_t)(pte & 0xfff00000) << 2;
 	}
+	else
+		pa |= (uint64_t)(pte & 0xfffffc00) << 2;
 
 	return pa;
 }
