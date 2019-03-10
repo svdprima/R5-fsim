@@ -60,11 +60,11 @@ public:
             pa = (uint64_t)va;
         else
         {
-            try
+            if(W_TLB.is_in_cache(va >> 12))
             {
                 pa = (W_TLB.get(va >> 12) << 12) | (va & 0xfff);
             }
-            catch (std::range_error)
+            else
             {
                 pa = Translate(va, WRITE);
                 W_TLB.put(va >> 12, pa >> 12);
@@ -94,11 +94,11 @@ public:
             pa = (uint64_t)va;
         else
         {
-            try
+            if(W_TLB.is_in_cache(va >> 12))
             {
                 pa = (W_TLB.get(va >> 12) << 12) | (va & 0xfff);
             }
-            catch (std::range_error)
+            else
             {
                 pa = Translate(va, WRITE);
                 W_TLB.put(va >> 12, pa >> 12);
@@ -123,11 +123,11 @@ public:
             pa = (uint64_t)va;
         else
         {
-            try
+            if(W_TLB.is_in_cache(va >> 12))
             {
                 pa = (W_TLB.get(va >> 12) << 12) | (va & 0xfff);
             }
-            catch (std::range_error)
+            else
             {
                 pa = Translate(va, WRITE);
                 W_TLB.put(va >> 12, pa >> 12);
@@ -159,11 +159,11 @@ public:
             pa = (uint64_t)va;
         else
         {
-            try
+            if(R_TLB.is_in_cache(va >> 12))
             {
                 pa = (R_TLB.get(va >> 12) << 12) | (va & 0xfff);
             }
-            catch (std::range_error)
+            else
             {
                 pa = Translate(va, READ);
                 R_TLB.put(va >> 12, pa >> 12);
@@ -179,11 +179,11 @@ public:
             pa = (uint64_t)va;
         else
         {
-            try
+            if (X_TLB.is_in_cache(va >> 12))
             {
                 pa = (X_TLB.get(va >> 12) << 12) | (va & 0xfff);
             }
-            catch (std::range_error)
+            else
             {
                 pa = Translate(va, EXEC);
                 X_TLB.put(va >> 12, pa >> 12);
@@ -212,11 +212,11 @@ public:
             pa = (uint64_t)va;
         else
         {
-            try
+            if(R_TLB.is_in_cache(va >> 12))
             {
                 pa = (R_TLB.get(va >> 12) << 12) | (va & 0xfff);
             }
-            catch (std::range_error)
+            else
             {
                 pa = Translate(va, READ);
                 R_TLB.put(va >> 12, pa >> 12);
@@ -240,11 +240,11 @@ public:
             pa = (uint64_t)va;
         else
         {
-            try
+            if(R_TLB.is_in_cache(va >> 12))
             {
                 pa = (R_TLB.get(va >> 12) << 12) | (va & 0xfff);
             }
-            catch (std::range_error)
+            else
             {
                 pa = Translate(va, READ);
                 R_TLB.put(va >> 12, pa >> 12);

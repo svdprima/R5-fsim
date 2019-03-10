@@ -6,6 +6,7 @@
 #include <array>
 #include "isa_exe.hpp"
 #include "hart_state.h"
+#include "lru_cache.h"
 
 enum class InstrType: uint8_t
 {
@@ -176,7 +177,11 @@ private:
     std::array <std::vector<CommandDescription>, 256> SortedCommands;
     static constexpr uint8_t oppcode_nu = sizeof(OppcodeType) / sizeof(OppcodeType[0]);
     static constexpr uint8_t cmd_nu     = sizeof(CommandList) / sizeof(CommandList[0]);
+    static constexpr uint8_t cache_size  = 128;
+    LRUCache<uint32_t, Instruction> InstrCache;
 public:
+    uint32_t miss;
+    uint32_t hit;
     Decoder ();
     uint8_t GetOppcodeNu ()
     {

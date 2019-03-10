@@ -40,11 +40,15 @@ public:
 		}
 	}
 
+    bool is_in_cache (const key_t& key)
+    {
+        return !(_cache_items_map.find(key) == _cache_items_map.end()); 
+    }
 	const value_t& get(const key_t& key)
 	{
 		auto it = _cache_items_map.find(key);
 		if (it == _cache_items_map.end())
-			throw std::range_error("There is no such key in cache");
+			throw std::range_error("There is no such key in cache\n");
 		else
 		{
 			_cache_items_list.splice(_cache_items_list.begin(), _cache_items_list, it->second);
