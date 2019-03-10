@@ -28,7 +28,8 @@ class MMU
 {
 private:
     uint32_t satp;
-    std::vector<uint8_t> mem;
+    std::vector<uint32_t> mem;
+    uint64_t max_pa;
     LRUCache<uint32_t, uint32_t> R_TLB;
     LRUCache<uint32_t, uint32_t> W_TLB;
     LRUCache<uint32_t, uint32_t> X_TLB;
@@ -42,16 +43,78 @@ public:
     };
 
     MMU(std::vector<uint32_t> &words, uint32_t n_pages);
-    void WriteWord(uint64_t pa, uint32_t data);
-    void WriteHalfWord(uint64_t pa, uint16_t data);
-    void WriteByte(uint64_t pa, uint8_t data);
-    void SetSatp(uint32_t satp_value);
+    void WriteWord(uint64_t pa, uint32_t data)
+    {
+        if(pa+3 > max_pa)
+            errx(EXIT_FAILURE, "Out of physical memory, pa - %#010lx.", pa);
+        if((pa & 0b11) == 0b00)
+            mem[pa>>2] = data;
+        else
+            errx(EXIT_FAILURE, "Unaligned word access, pa - %#010lx.", pa);
+    }
+    void WriteHalfWord(uint64_t pa, uint16_t data)
+    {
+        if(pa+1 > max_pa)
+            errx(EXIT_FAILURE, "Out of physical memory, pa - %#010lx.", pa);
+        if((pa & 0b1) == 0b0)
+        {
+            uint32_t offset_in_word = (pa & 0b1) * 16;
+            mem[pa>>2] = (mem[pa>>2] & ~(0xffff << offset_in_word))
+                            | ((uint32_t)data << offset_in_word);
+        }
+        else
+            errx(EXIT_FAILURE, "Unaligned half word access, pa - %#010lx.", pa);
+        
+    }
+    void WriteByte(uint64_t pa, uint8_t data)
+    {
+        if(pa > max_pa)
+            errx(EXIT_FAILURE, "Out of physical memory, pa - %#010lx.", pa);
+        uint32_t offset_in_word = (pa & 0b11) * 8;
+        mem[pa>>2] = (mem[pa>>2] & ~(0xff << offset_in_word))
+                        | ((uint32_t)data << offset_in_word);
+    }
+    void SetSatp(uint32_t satp_value)
+    {
+        satp = satp_value;
+    }
     void MemDump();
-    uint32_t ReadWord(uint64_t pa);
-    uint16_t ReadHalfWord(uint64_t pa);
-    uint8_t ReadByte(uint64_t pa);
-    uint32_t GetSatp();
-    void PrintSatp();
+    uint32_t ReadWord(uint64_t pa)
+    {
+        if(pa+3 > max_pa)
+            errx(EXIT_FAILURE, "Out of physical memory, pa - %#010lx.", pa);
+        if((pa & 0b11) == 0b00)
+            return mem[pa>>2];
+        else
+            errx(EXIT_FAILURE, "Unaligned word access, pa - %#010lx.", pa);
+    }
+    uint16_t ReadHalfWord(uint64_t pa)
+    {
+        if(pa+1 > max_pa)
+            errx(EXIT_FAILURE, "Out of physical memory, pa - %#010lx.", pa);
+        if((pa & 0b1) == 0b0)
+        {
+            uint32_t offset_in_word = (pa & 0b1) * 16;
+            return (mem[pa>>2] >> offset_in_word) & 0xffff;
+        }
+        else
+            errx(EXIT_FAILURE, "Unaligned half word access, pa - %#010lx.", pa);
+    }
+    uint8_t ReadByte(uint64_t pa)
+    {
+        if(pa > max_pa)
+            errx(EXIT_FAILURE, "Out of physical memory, pa - %#010lx.", pa);
+        uint32_t offset_in_word = (pa & 0b11) * 8;
+        return (mem[pa>>2] >> offset_in_word) & 0xff;
+    }
+    uint32_t GetSatp()
+    {
+        return satp;
+    }
+    void PrintSatp()
+    {
+        printf ("SATP is %x\n", satp);
+    }
     uint64_t Translate(uint32_t va, AccessType access);
     ~MMU() {}
 };

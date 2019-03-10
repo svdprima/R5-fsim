@@ -4,51 +4,14 @@
 MMU::MMU(std::vector<uint32_t> &words, uint32_t n_pages) 
 : R_TLB(64), W_TLB(64), X_TLB(64)
 {
-	if(words.size()*sizeof(uint32_t) > n_pages*PAGESIZE)
+	max_pa = n_pages*PAGESIZE;
+	if(words.size()*sizeof(uint32_t) > max_pa)
 		errx(EXIT_FAILURE, "Not enough pages, address 0x%#010x doesn't fit.", 
 									(uint32_t)(words.size()*sizeof(uint32_t)));
-	mem.resize(n_pages*PAGESIZE);
-	memcpy(&mem[0], (void*)words.data(), words.size()*sizeof(uint32_t));
+	mem.resize(max_pa >> 2);
+	mem.insert(mem.begin(), words.begin(), words.end());
 
 	satp = 0x00000000;
-}
-
-
-
-void MMU::WriteWord(uint64_t pa, uint32_t data)
-{
-	if(pa+3 > mem.size())
-		errx(EXIT_FAILURE, "Out of physical memory, pa - %#010lx.", pa);
-	mem[pa] = (uint8_t)data;
-	mem[pa + 1] = (uint8_t)(data >> 8);
-	mem[pa + 2] = (uint8_t)(data >> 16);
-	mem[pa + 3] = (uint8_t)(data >> 24);
-}
-
-
-
-void MMU::WriteHalfWord(uint64_t pa, uint16_t data)
-{
-	if(pa+1 > mem.size())
-		errx(EXIT_FAILURE, "Out of physical memory, pa - %#010lx.", pa);
-	mem[pa]       = (uint8_t)data;
-	mem[pa + 1]   = (uint8_t)(data >> 8);
-}
-
-
-
-void MMU::WriteByte(uint64_t pa, uint8_t data)
-{
-	if(pa > mem.size())
-		errx(EXIT_FAILURE, "Out of physical memory, pa - %#010lx.", pa);
-	mem[pa] = data;
-}
-
-
-
-void MMU::SetSatp(uint32_t satp_value)
-{
-	satp = satp_value;
 }
 
 
@@ -60,48 +23,6 @@ void MMU::MemDump()
 	fout.close();
 }
 
-
-
-uint32_t MMU::ReadWord(uint64_t pa)
-{
-	if(pa+3 > mem.size())
-		errx(EXIT_FAILURE, "Out of physical memory, pa - %#010lx.", pa);
-	return	((uint32_t)mem[pa + 3] << 24) | 
-			((uint32_t)mem[pa + 2] << 16) | 
-			((uint32_t)mem[pa + 1] << 8)  | 
-			 (uint32_t)mem[pa];
-}
-
-
-
-uint16_t MMU::ReadHalfWord(uint64_t pa)
-{
-	if(pa+1 > mem.size())
-		errx(EXIT_FAILURE, "Out of physical memory, pa - %#010lx.", pa);
-	return ((uint16_t)mem[pa + 1] << 8) | 
-            (uint16_t)mem[pa];
-}
-
-
-
-uint8_t MMU::ReadByte(uint64_t pa)
-{
-	if(pa > mem.size())
-		errx(EXIT_FAILURE, "Out of physical memory, pa - %#010lx.", pa);
-	return mem[pa];
-}
-
-
-
-uint32_t MMU::GetSatp()
-{
-	return satp;
-}
-
-void MMU::PrintSatp()
-{
-    printf ("SATP is %x\n", satp);
-}
 
 
 uint64_t MMU::Translate(uint32_t va, AccessType access)
