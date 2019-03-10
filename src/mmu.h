@@ -21,12 +21,17 @@
 #include <err.h>
 #include <string.h>
 #include <fstream>
+#include <stdexcept>
+#include "lru_cache.h"
 
 class MMU
 {
 private:
     uint32_t satp;
     std::vector<uint8_t> mem;
+    LRUCache<uint32_t, uint32_t> R_TLB;
+    LRUCache<uint32_t, uint32_t> W_TLB;
+    LRUCache<uint32_t, uint32_t> X_TLB;
 
 public:
     enum AccessType
