@@ -22,8 +22,16 @@ LIBS = -lelf
 
 
 
-run: build_src
+run: build_src build_test
 	@$(BUILD_SRC)/simulator $(BUILD_TEST)/$(TEST).elf
+
+
+
+debug: CFLAGS += -g
+debug: build_src build_test
+	@valgrind --tool=callgrind --dump-instr=yes --callgrind-out-file=$(BUILD_SRC)/callgrind.out \
+$(BUILD_SRC)/simulator $(BUILD_TEST)/$(TEST).elf
+	@kcachegrind $(BUILD_SRC)/callgrind.out
 
 
 
