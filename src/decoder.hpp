@@ -4,101 +4,71 @@
 #include <vector>
 #include <iostream>
 #include <array>
-#include "isa_exe.hpp"
 #include "hart_state.h"
 #include "lru_cache.h"
+#include "ir.hpp"
 
-enum class InstrType: uint8_t
-{
-    Undefined,
-    RType,
-    IType,
-    SType,
-    BType,  
-    UType,
-    JType
-};
+//RV32I Base Instruction Set
+void LUIExec    (const Instruction* first_instr, const Instruction* cur_instr, HartState* hart_state);
+void AUIPCExec  (const Instruction* first_instr, const Instruction* cur_instr, HartState* hart_state);
+void JALExec    (const Instruction* first_instr, const Instruction* cur_instr, HartState* hart_state);
+void JALRExec   (const Instruction* first_instr, const Instruction* cur_instr, HartState* hart_state);
+void BEQExec    (const Instruction* first_instr, const Instruction* cur_instr, HartState* hart_state);
+void BNEExec    (const Instruction* first_instr, const Instruction* cur_instr, HartState* hart_state);
+void BLTExec    (const Instruction* first_instr, const Instruction* cur_instr, HartState* hart_state);
+void BGEExec    (const Instruction* first_instr, const Instruction* cur_instr, HartState* hart_state);
+void BLTUExec   (const Instruction* first_instr, const Instruction* cur_instr, HartState* hart_state);
+void BGEUExec   (const Instruction* first_instr, const Instruction* cur_instr, HartState* hart_state);
+void LBExec     (const Instruction* first_instr, const Instruction* cur_instr, HartState* hart_state);
+void LHExec     (const Instruction* first_instr, const Instruction* cur_instr, HartState* hart_state);
+void LWExec     (const Instruction* first_instr, const Instruction* cur_instr, HartState* hart_state);
+void LBUExec    (const Instruction* first_instr, const Instruction* cur_instr, HartState* hart_state);
+void LHUExec    (const Instruction* first_instr, const Instruction* cur_instr, HartState* hart_state);
+void SBExec     (const Instruction* first_instr, const Instruction* cur_instr, HartState* hart_state);
+void SHExec     (const Instruction* first_instr, const Instruction* cur_instr, HartState* hart_state);
+void SWExec     (const Instruction* first_instr, const Instruction* cur_instr, HartState* hart_state);
+void ADDIExec   (const Instruction* first_instr, const Instruction* cur_instr, HartState* hart_state);
+void SLTIExec   (const Instruction* first_instr, const Instruction* cur_instr, HartState* hart_state);
+void SLTIUExec  (const Instruction* first_instr, const Instruction* cur_instr, HartState* hart_state);
+void XORIExec   (const Instruction* first_instr, const Instruction* cur_instr, HartState* hart_state);
+void ORIExec    (const Instruction* first_instr, const Instruction* cur_instr, HartState* hart_state);
+void ANDIExec   (const Instruction* first_instr, const Instruction* cur_instr, HartState* hart_state);
+void SLLIExec   (const Instruction* first_instr, const Instruction* cur_instr, HartState* hart_state);
+void SRLIExec   (const Instruction* first_instr, const Instruction* cur_instr, HartState* hart_state);
+void SRAIExec   (const Instruction* first_instr, const Instruction* cur_instr, HartState* hart_state);
+void ADDExec    (const Instruction* first_instr, const Instruction* cur_instr, HartState* hart_state);
+void SUBExec    (const Instruction* first_instr, const Instruction* cur_instr, HartState* hart_state);
+void SLLExec    (const Instruction* first_instr, const Instruction* cur_instr, HartState* hart_state);
+void SLTExec    (const Instruction* first_instr, const Instruction* cur_instr, HartState* hart_state);
+void SLTUExec   (const Instruction* first_instr, const Instruction* cur_instr, HartState* hart_state);
+void XORExec    (const Instruction* first_instr, const Instruction* cur_instr, HartState* hart_state);
+void SRLExec    (const Instruction* first_instr, const Instruction* cur_instr, HartState* hart_state);
+void SRAExec    (const Instruction* first_instr, const Instruction* cur_instr, HartState* hart_state);
+void ORExec     (const Instruction* first_instr, const Instruction* cur_instr, HartState* hart_state);
+void ANDExec    (const Instruction* first_instr, const Instruction* cur_instr, HartState* hart_state);
+//void FENCEExec  (const Instruction* first_instr, const Instruction* cur_instr, HartState* hart_state);
+//void FENCEIExec (const Instruction* first_instr, const Instruction* cur_instr, HartState* hart_state);
+void ECALLExec  (const Instruction* first_instr, const Instruction* cur_instr, HartState* hart_state);
+//void EBREAKExec (const Instruction* first_instr, const Instruction* cur_instr, HartState* hart_state);
+void CSRRWExec  (const Instruction* first_instr, const Instruction* cur_instr, HartState* hart_state);
+void CSRRSExec  (const Instruction* first_instr, const Instruction* cur_instr, HartState* hart_state);
+void CSRRCExec  (const Instruction* first_instr, const Instruction* cur_instr, HartState* hart_state);
+void CSRRWIExec (const Instruction* first_instr, const Instruction* cur_instr, HartState* hart_state);
+void CSRRSIExec (const Instruction* first_instr, const Instruction* cur_instr, HartState* hart_state);
+void CSRRCIExec (const Instruction* first_instr, const Instruction* cur_instr, HartState* hart_state);
+void BASICDUMMY (const Instruction* first_instr, const Instruction* cur_instr, HartState* hart_state);
 
-enum class Oppcodes: uint8_t
-{
-    LUI      = 0b0110111,
-    AUIPC    = 0b0010111,
-    JAL      = 0b1101111,
-    JALR     = 0b1100111,
-    BRANCH   = 0b1100011,
-    LOAD     = 0b0000011,
-    STORE    = 0b0100011,
-    OPP_IMM  = 0b0010011,
-    OP       = 0b0110011,
-    MISC_MEM = 0b0001111,
-    SYSTEM   = 0b1110011,
-    UNINIT   = 0b11  
-};
+//RV32M Standard Extension
 
-struct OppcodeDescr
-{
-    Oppcodes oppcode;
-    InstrType type;
-};
-
-const OppcodeDescr OppcodeType[] = 
-{
-    {Oppcodes::LUI,     InstrType::UType},
-    {Oppcodes::AUIPC,   InstrType::UType},
-    {Oppcodes::JAL,     InstrType::JType},
-    {Oppcodes::JALR,    InstrType::IType},
-    {Oppcodes::BRANCH,  InstrType::BType},
-    {Oppcodes::LOAD,    InstrType::IType},
-    {Oppcodes::STORE,   InstrType::SType},
-    {Oppcodes::OPP_IMM, InstrType::IType},
-    {Oppcodes::OP,      InstrType::RType},
-    {Oppcodes::MISC_MEM,InstrType::IType},
-    {Oppcodes::SYSTEM,  InstrType::IType}
-};
-
-class Instruction
-{
-private:
-    uint8_t oppcode;
-    uint8_t rd;
-    uint8_t funct3;
-    uint8_t rs1;
-    uint8_t rs2;
-    uint8_t funct7;
-    uint32_t imm;
-    void (*cmd) (const Instruction*, const Instruction*, HartState*);
-    const char* command_name;
-public:
-    InstrType type;
-    Instruction ()
-    {
-        oppcode = 0;
-        rd      = 0;
-        funct3  = 0;
-        rs1     = 0;
-        rs2     = 0;
-        funct7  = 0;
-        imm     = 0;
-        type = InstrType::Undefined;
-    }
-    uint8_t GetOppcode () const;
-    uint8_t GetRd () const;
-    uint8_t GetFunct3 () const;
-    uint8_t GetRs1 () const;
-    uint8_t GetRs2 () const;
-    uint8_t GetFunct7 () const;
-    uint32_t GetImm () const;
-    void ExecCommand (const Instruction* first_instr, HartState* hart_state) const;
-    void SetOppcode (uint8_t oppc);
-    void SetRd (uint8_t RD);
-    void SetFunct3 (uint8_t f3);
-    void SetRs1 (uint8_t RS1);
-    void SetRs2 (uint8_t RS2);
-    void SetFunct7 (uint8_t f7);
-    void SetImm (uint32_t IMM);
-    void SetCommand (const char* c_name, void (*command) (const Instruction*, const Instruction*, HartState*));
-    void PrintInstr (const bool is_verbose) const;
-};
+void MULExec    (const Instruction* first_instr, const Instruction* cur_instr, HartState* hart_state);
+void MULHExec   (const Instruction* first_instr, const Instruction* cur_instr, HartState* hart_state);
+void MULHSUExec (const Instruction* first_instr, const Instruction* cur_instr, HartState* hart_state);
+void MULHUExec  (const Instruction* first_instr, const Instruction* cur_instr, HartState* hart_state);
+void DIVExec    (const Instruction* first_instr, const Instruction* cur_instr, HartState* hart_state);
+void DIVUExec   (const Instruction* first_instr, const Instruction* cur_instr, HartState* hart_state);
+void REMExec    (const Instruction* first_instr, const Instruction* cur_instr, HartState* hart_state);
+void REMUExec   (const Instruction* first_instr, const Instruction* cur_instr, HartState* hart_state);
+void DUMMYExec  (const Instruction* first_instr, const Instruction* cur_instr, HartState* hart_state);
 
 struct CommandDescription
 {
@@ -108,7 +78,6 @@ struct CommandDescription
     uint8_t funct3 = 0;
     uint8_t funct7 = 0;
 };
-
 const CommandDescription CommandList [] = 
 {
     {"LUI",   &LUIExec,   Oppcodes::LUI},
@@ -177,11 +146,7 @@ private:
     std::array <std::vector<CommandDescription>, 256> SortedCommands;
     static constexpr uint8_t oppcode_nu = sizeof(OppcodeType) / sizeof(OppcodeType[0]);
     static constexpr uint8_t cmd_nu     = sizeof(CommandList) / sizeof(CommandList[0]);
-    static constexpr uint8_t cache_size  = 128;
-    LRUCache<uint32_t, Instruction> InstrCache;
 public:
-    uint32_t miss;
-    uint32_t hit;
     Decoder ();
     uint8_t GetOppcodeNu ()
     {
@@ -193,4 +158,5 @@ public:
     };
     Instruction Decode (uint32_t raw_instr);
 };
+
 #endif

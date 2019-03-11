@@ -43,15 +43,15 @@ public:
         if(reg_num != 0)
             regs[reg_num] = reg_value;
     }
-    void WriteWord(uint32_t va, uint32_t data)
+    inline void WriteWord(uint32_t va, uint32_t data)
     {
         _MMU.WriteWord(va, data);
     }
-    void WriteHalfWord(uint32_t va, uint16_t data)
+    inline void WriteHalfWord(uint32_t va, uint16_t data)
     {
         _MMU.WriteHalfWord(va, data);
     }
-    void WriteByte(uint32_t va, uint8_t data)
+    inline void WriteByte(uint32_t va, uint8_t data)
     {
         _MMU.WriteByte(va, data);
     }
@@ -59,21 +59,21 @@ public:
     {
         _MMU.MemDump();
     }
-    uint32_t GetPc()
+    inline uint32_t GetPc()
     {
         return pc;
     }
-    uint32_t GetSatp()
+    inline uint32_t GetSatp()
     {
         return _MMU.GetSatp();
     }
-    uint32_t GetReg(uint8_t reg_num)
+    inline uint32_t GetReg(uint8_t reg_num)
     {
         if(reg_num > 32)
             errx(EXIT_FAILURE, "Register number is bigger than 32.");
         return regs[reg_num];
     }
-    uint32_t ReadWord(uint32_t va)
+    inline uint32_t ReadWord(uint32_t va)
     {
         return _MMU.ReadWord(va);
     }
@@ -81,11 +81,11 @@ public:
     {
         return _MMU.ReadHalfWord(va);
     }
-    uint8_t ReadByte(uint32_t va)
+    inline uint8_t ReadByte(uint32_t va)
     {
         return _MMU.ReadByte(va);
     }
-    uint32_t Fetch(uint32_t va)
+    inline uint32_t Fetch(uint32_t va)
     {
         return _MMU.Fetch(va);
     }
@@ -107,11 +107,11 @@ public:
     {
         printf ("Word at specified adress: %x\n", ReadWord(va));
     }
-    void IncreaseCmdCount(uint32_t incr)
+    inline void IncreaseCmdCount(uint32_t incr)
     {
         cmd_counter += incr;
     }
-    uint32_t GetCmdCount ()
+    inline uint32_t GetCmdCount ()
     {
         return cmd_counter;
     }

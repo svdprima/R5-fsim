@@ -16,9 +16,11 @@ private:
 	std::list<key_value_pair_t> _cache_items_list;
 	std::unordered_map<key_t, list_iterator_t> _cache_items_map;
 	size_t _max_size;
+    uint64_t hits;
+    uint64_t misses;
 
 public:
-    LRUCache(size_t max_size) : _max_size(max_size) {}
+    LRUCache(size_t max_size) : _max_size(max_size), hits(0), misses(0) {}
 
     void put(const key_t& key, const value_t& value)
     {
@@ -55,6 +57,22 @@ public:
 			return it->second->second;
 		}
 	}
+    void Hit()
+    {
+        hits++;
+    }
+    void Miss()
+    {
+        misses++;
+    }
+    inline uint32_t GetMissCount ()
+    {
+        return misses;
+    }
+    inline uint32_t GetHitCount ()
+    {
+        return hits;
+    }
 };
 
 #endif
