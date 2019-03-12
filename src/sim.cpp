@@ -32,9 +32,38 @@ void Sim::Execute (bool is_verbose)
             }
         }
     }
-    catch (HartException &exc)
+    catch (FinishException &exc)
     {
         printf ("%s", exc.what());
+    }
+    catch (DummyException &exc)
+    {
+        printf ("%s", exc.what());
+    }
+    catch (CalcException &exc)
+    {
+        printf ("%s", exc.what());
+    }
+    catch (RegException &exc)
+    {
+        printf ("%s", exc.what());
+    }
+    catch (OutOfMemException &exc)
+    {
+        printf ("%s", exc.what());
+        printf ("Physical address : 0x%lx\n", exc.GetPa());
+    }
+    catch (UnalignException &exc)
+    {
+        printf ("%s", exc.what());
+        printf ("Physical address : 0x%lx\n", exc.GetPa());
+        hart_state.MemDump();
+    }
+    catch (PageFaultException &exc)
+    {
+        printf ("%s", exc.what());
+        printf ("PTE : 0x%x\n", exc.GetPte());
+        printf ("PTE address : 0x%lx\n", exc.GetPteAddr());
         hart_state.MemDump();
     }
     catch (std::range_error &err)

@@ -274,12 +274,12 @@ void ANDExec    (const Instruction* first_instr, const Instruction* cur_instr, H
 
 void DUMMYExec  ([[maybe_unused]]const Instruction* first_instr,[[maybe_unused]] const Instruction* cur_instr, [[maybe_unused]]HartState* hart_state)
 {
-    throw HartException("DUMMY instruction\n");
+    throw DummyException("DUMMY instruction\n");
 }
 
 void ECALLExec  ([[maybe_unused]]const Instruction* first_instr, [[maybe_unused]]const Instruction* cur_instr, [[maybe_unused]]HartState* hart_state)
 {
-    throw HartException ("Finished execution!\n");
+    throw FinishException ("Finished execution!\n");
 }
 
 void MULExec    (const Instruction* first_instr, const Instruction* cur_instr, HartState* hart_state)
@@ -309,7 +309,7 @@ void MULHUExec  (const Instruction* first_instr, const Instruction* cur_instr, H
 void DIVExec    (const Instruction* first_instr, const Instruction* cur_instr, HartState* hart_state)
 {
     if (RS2v == 0)
-        throw HartException("Division by zero!\n");
+        throw CalcException("Division by zero!\n");
     SET_R(RDn, static_cast<int32_t>(RS1v) / static_cast<int32_t>(RS2v));
     NEXT_INSTR;
 }
@@ -343,7 +343,7 @@ void BASICDUMMY (const Instruction* first_instr, const Instruction* cur_instr, H
 void CSRRWExec  (const Instruction* first_instr, const Instruction* cur_instr, HartState* hart_state)
 {
     if (IMM != 0x180)
-        throw HartException("Only SATP system register is supported!\n");
+        throw RegException("Only SATP system register is supported!\n");
     SET_R(RDn, GET_SATP());
     SET_SATP(RS1v);
     NEXT_INSTR;
@@ -352,7 +352,7 @@ void CSRRWExec  (const Instruction* first_instr, const Instruction* cur_instr, H
 void CSRRSExec  (const Instruction* first_instr, const Instruction* cur_instr, HartState* hart_state)
 {
     if (IMM != 0x180)
-        throw HartException("Only SATP system register is supported!\n");
+        throw RegException("Only SATP system register is supported!\n");
     SET_R(RDn, GET_SATP());
     SET_SATP(GET_SATP() | RS1v);
     NEXT_INSTR;
@@ -361,7 +361,7 @@ void CSRRSExec  (const Instruction* first_instr, const Instruction* cur_instr, H
 void CSRRCExec  (const Instruction* first_instr, const Instruction* cur_instr, HartState* hart_state)
 {
     if (IMM != 0x180)
-        throw HartException("Only SATP system register is supported!\n");
+        throw RegException("Only SATP system register is supported!\n");
     SET_R(RDn, GET_SATP());
     SET_SATP(GET_SATP() | (!RS1v));
     NEXT_INSTR;
@@ -370,7 +370,7 @@ void CSRRCExec  (const Instruction* first_instr, const Instruction* cur_instr, H
 void CSRRWIExec (const Instruction* first_instr, const Instruction* cur_instr, HartState* hart_state)
 {
     if (IMM != 0x180)
-        throw HartException("Only SATP system register is supported!\n");
+        throw RegException("Only SATP system register is supported!\n");
     SET_R(RDn, GET_SATP());
     SET_SATP(static_cast<uint32_t>(RS1n)); //the uimm is formally in rs1 field of I-TYPE instr
     NEXT_INSTR;
@@ -379,7 +379,7 @@ void CSRRWIExec (const Instruction* first_instr, const Instruction* cur_instr, H
 void CSRRSIExec (const Instruction* first_instr, const Instruction* cur_instr, HartState* hart_state)
 {
     if (IMM != 0x180)
-        throw HartException("Only SATP system register is supported!\n");
+        throw RegException("Only SATP system register is supported!\n");
     SET_R(RDn, GET_SATP());
     SET_SATP(GET_SATP() | static_cast<uint32_t>(RS1n));
     NEXT_INSTR;
@@ -388,7 +388,7 @@ void CSRRSIExec (const Instruction* first_instr, const Instruction* cur_instr, H
 void CSRRCIExec (const Instruction* first_instr, const Instruction* cur_instr, HartState* hart_state)
 {
     if (IMM != 0x180)
-        throw HartException("Only SATP system register is supported!\n");
+        throw RegException("Only SATP system register is supported!\n");
     SET_R(RDn, GET_SATP());
     SET_SATP(GET_SATP() | (!static_cast<uint32_t>(RS1n)));
     NEXT_INSTR;

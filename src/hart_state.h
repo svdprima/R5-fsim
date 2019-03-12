@@ -4,7 +4,6 @@
 #include <stdint.h>
 #include <stdlib.h>
 #include <vector>
-#include <err.h>
 #include <fstream>
 #include "mmu.h"
 
@@ -39,7 +38,7 @@ public:
     void SetReg(uint8_t reg_num, uint32_t reg_value)
     {
         if(reg_num > 32)
-            errx(EXIT_FAILURE, "Register number is bigger than 32.");
+            throw RegException("Register number is bigger than 32.\n");
         if(reg_num != 0)
             regs[reg_num] = reg_value;
     }
@@ -70,7 +69,7 @@ public:
     inline uint32_t GetReg(uint8_t reg_num)
     {
         if(reg_num > 32)
-            errx(EXIT_FAILURE, "Register number is bigger than 32.");
+            throw RegException("Register number is bigger than 32.\n");
         return regs[reg_num];
     }
     inline uint32_t ReadWord(uint32_t va)

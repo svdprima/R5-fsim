@@ -18,11 +18,10 @@
 #include <stdint.h>
 #include <stdlib.h>
 #include <vector>
-#include <err.h>
 #include <string.h>
 #include <fstream>
-#include <stdexcept>
 #include "lru_cache.h"
+#include "aux.hpp"
 
 class MMU
 {
@@ -47,11 +46,11 @@ public:
     void WriteWordPhys(uint64_t pa, uint32_t data)
     {
         if(pa+3 > max_pa)
-            errx(EXIT_FAILURE, "Out of physical memory, pa - %#010lx.", pa);
+            throw OutOfMemException("Out of physical memory.\n", pa);
         if((pa & 0b11) == 0b00)
             mem[pa>>2] = data;
         else
-            errx(EXIT_FAILURE, "Unaligned word access, pa - %#010lx.", pa);
+            throw UnalignException("Unaligned word access.\n", pa);
     }
     void WriteWord(uint32_t va, uint32_t data)
     {
@@ -77,7 +76,7 @@ public:
     void WriteHalfWordPhys(uint64_t pa, uint16_t data)
     {
         if(pa+1 > max_pa)
-            errx(EXIT_FAILURE, "Out of physical memory, pa - %#010lx.", pa);
+            throw OutOfMemException("Out of physical memory.\n", pa);
         if((pa & 0b1) == 0b0)
         {
             uint32_t offset_in_word = (pa & 0b1) * 16;
@@ -85,7 +84,7 @@ public:
                             | ((uint32_t)data << offset_in_word);
         }
         else
-            errx(EXIT_FAILURE, "Unaligned half word access, pa - %#010lx.", pa);
+            throw UnalignException("Unaligned half word access.\n", pa);
     }
     void WriteHalfWord(uint32_t va, uint32_t data)
     {
@@ -111,7 +110,7 @@ public:
     void WriteBytePhys(uint64_t pa, uint8_t data)
     {
         if(pa > max_pa)
-            errx(EXIT_FAILURE, "Out of physical memory, pa - %#010lx.", pa);
+            throw OutOfMemException("Out of physical memory.\n", pa);
         uint32_t offset_in_word = (pa & 0b11) * 8;
         mem[pa>>2] = (mem[pa>>2] & ~(0xff << offset_in_word))
                         | ((uint32_t)data << offset_in_word);
@@ -146,11 +145,11 @@ public:
     uint32_t ReadWordPhys(uint64_t pa)
     {
         if(pa+3 > max_pa)
-            errx(EXIT_FAILURE, "Out of physical memory, pa - %#010lx.", pa);
+            throw OutOfMemException("Out of physical memory.\n", pa);
         if((pa & 0b11) == 0b00)
             return mem[pa>>2];
         else
-            errx(EXIT_FAILURE, "Unaligned word access, pa - %#010lx.", pa);
+            throw UnalignException("Unaligned word access.\n", pa);
     }
     uint32_t ReadWord(uint32_t va)
     {
@@ -179,7 +178,7 @@ public:
             pa = (uint64_t)va;
         else
         {
-            if (X_TLB.is_in_cache(va >> 12))
+            if(X_TLB.is_in_cache(va >> 12))
             {
                 pa = (X_TLB.get(va >> 12) << 12) | (va & 0xfff);
             }
@@ -196,14 +195,14 @@ public:
     uint16_t ReadHalfWordPhys(uint64_t pa)
     {
         if(pa+1 > max_pa)
-            errx(EXIT_FAILURE, "Out of physical memory, pa - %#010lx.", pa);
+            throw OutOfMemException("Out of physical memory.\n", pa);
         if((pa & 0b1) == 0b0)
         {
             uint32_t offset_in_word = (pa & 0b1) * 16;
             return (mem[pa>>2] >> offset_in_word) & 0xffff;
         }
         else
-            errx(EXIT_FAILURE, "Unaligned half word access, pa - %#010lx.", pa);
+            throw UnalignException("Unaligned half word access.\n", pa);
     }
     uint16_t ReadHalfWord(uint32_t va)
     {
@@ -229,7 +228,7 @@ public:
     uint8_t ReadBytePhys(uint64_t pa)
     {
         if(pa > max_pa)
-            errx(EXIT_FAILURE, "Out of physical memory, pa - %#010lx.", pa);
+            throw OutOfMemException("Out of physical memory.\n", pa);
         uint32_t offset_in_word = (pa & 0b11) * 8;
         return (mem[pa>>2] >> offset_in_word) & 0xff;
     }
