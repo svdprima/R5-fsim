@@ -9,7 +9,7 @@
 class BasicBlock
 {
 private:
-    static constexpr uint32_t block_size = 4; //not including BASICBLOCK DUMMY
+    static constexpr uint32_t block_size = 16; //not including BASICBLOCK DUMMY
     std::array<Instruction, block_size + 1> instructions;
 public:
     BasicBlock() = default;

@@ -279,6 +279,7 @@ void DUMMYExec  ([[maybe_unused]]const Instruction* first_instr,[[maybe_unused]]
 
 void ECALLExec  ([[maybe_unused]]const Instruction* first_instr, [[maybe_unused]]const Instruction* cur_instr, [[maybe_unused]]HartState* hart_state)
 {
+    CMD_incr(cur_instr - first_instr + 1);
     throw FinishException ("Finished execution!\n");
 }
 
@@ -337,7 +338,7 @@ void REMUExec   (const Instruction* first_instr, const Instruction* cur_instr, H
 void BASICDUMMY (const Instruction* first_instr, const Instruction* cur_instr, HartState* hart_state)
 {
     SET_PC (GET_PC() + (cur_instr - first_instr) * 4);
-    CMD_incr(cur_instr - first_instr + 1);
+    CMD_incr(cur_instr - first_instr);
 }
 
 void CSRRWExec  (const Instruction* first_instr, const Instruction* cur_instr, HartState* hart_state)
