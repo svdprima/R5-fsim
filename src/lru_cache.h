@@ -46,25 +46,23 @@ public:
     {
         return !(_cache_items_map.find(key) == _cache_items_map.end()); 
     }
-	const value_t& get(const key_t& key)
+	
+	value_t* get(const key_t& key)
 	{
 		auto it = _cache_items_map.find(key);
 		if (it == _cache_items_map.end())
-			throw std::range_error("There is no such key in cache\n");
+		{
+			misses++;
+			return NULL;
+		}
 		else
 		{
 			_cache_items_list.splice(_cache_items_list.begin(), _cache_items_list, it->second);
-			return it->second->second;
+			hits++;
+			return &(it->second->second);
 		}
 	}
-    void Hit()
-    {
-        hits++;
-    }
-    void Miss()
-    {
-        misses++;
-    }
+
     inline uint32_t GetMissCount ()
     {
         return misses;

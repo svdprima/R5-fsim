@@ -9,22 +9,19 @@ void Sim::Execute ()
     try
     {
         uint32_t cur_instr_addr = 0;
-        BasicBlock BB;
+        BasicBlock* BB;
+        BasicBlock BB_new;
         while (true)
         {
             cur_instr_addr = hart_state.GetPc();
-            if (InstrCache.is_in_cache(cur_instr_addr))
+            BB = InstrCache.get(cur_instr_addr);
+            if (BB == NULL)
             {
-                BB = InstrCache.get(cur_instr_addr);
-                InstrCache.Hit();
+                BB_new = BasicBlock (hart_state, DCD);
+                InstrCache.put (cur_instr_addr, BB_new);
+                BB = &BB_new;
             }
-            else
-            {
-                BB = BasicBlock (hart_state, DCD);
-                InstrCache.put (cur_instr_addr, BB);
-                InstrCache.Miss();
-            }
-            BB.ExecuteBlock (hart_state);
+            BB->ExecuteBlock (hart_state);
             if (hart_state.GetCmdCount() >= MAX_INSTR)
             {
                 printf ("Maximum number of instructions has been reached!\n");
@@ -65,10 +62,6 @@ void Sim::Execute ()
         printf ("PTE : 0x%x\n", exc.GetPte());
         printf ("PTE address : 0x%lx\n", exc.GetPteAddr());
         hart_state.MemDump();
-    }
-    catch (std::range_error &err)
-    {
-        printf ("%s", err.what());
     }
     std::chrono::high_resolution_clock::time_point t_finish = std::chrono::high_resolution_clock::now();
     std::chrono::duration<double> ex_time = std::chrono::duration_cast<std::chrono::duration<double>>(t_finish - t_start);

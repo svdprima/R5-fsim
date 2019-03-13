@@ -55,19 +55,19 @@ public:
     void WriteWord(uint32_t va, uint32_t data)
     {
         uint64_t pa;
+        uint32_t *ppn;
         if(satp >> 31 == 0)
             pa = (uint64_t)va;
         else
         {
-            if(W_TLB.is_in_cache(va >> 12))
-            {
-                pa = (W_TLB.get(va >> 12) << 12) | (va & 0xfff);
-            }
-            else
+            ppn = W_TLB.get(va >> 12);
+            if(ppn == NULL)
             {
                 pa = Translate(va, WRITE);
                 W_TLB.put(va >> 12, pa >> 12);
             }
+            else
+                pa = (*ppn << 12) | (va & 0xfff);
         }
 
         WriteWordPhys(pa, data);
@@ -89,19 +89,19 @@ public:
     void WriteHalfWord(uint32_t va, uint32_t data)
     {
         uint64_t pa;
+        uint32_t *ppn;
         if(satp >> 31 == 0)
             pa = (uint64_t)va;
         else
         {
-            if(W_TLB.is_in_cache(va >> 12))
-            {
-                pa = (W_TLB.get(va >> 12) << 12) | (va & 0xfff);
-            }
-            else
+            ppn = W_TLB.get(va >> 12);
+            if(ppn == NULL)
             {
                 pa = Translate(va, WRITE);
                 W_TLB.put(va >> 12, pa >> 12);
             }
+            else
+                pa = (*ppn << 12) | (va & 0xfff);
         }
 
         WriteHalfWordPhys(pa, data);
@@ -118,19 +118,19 @@ public:
     void WriteByte(uint32_t va, uint32_t data)
     {
         uint64_t pa;
+        uint32_t *ppn;
         if(satp >> 31 == 0)
             pa = (uint64_t)va;
         else
         {
-            if(W_TLB.is_in_cache(va >> 12))
-            {
-                pa = (W_TLB.get(va >> 12) << 12) | (va & 0xfff);
-            }
-            else
+            ppn = W_TLB.get(va >> 12);
+            if(ppn == NULL)
             {
                 pa = Translate(va, WRITE);
                 W_TLB.put(va >> 12, pa >> 12);
             }
+            else
+                pa = (*ppn << 12) | (va & 0xfff);
         }
 
         WriteBytePhys(pa, data);
@@ -154,19 +154,19 @@ public:
     uint32_t ReadWord(uint32_t va)
     {
         uint64_t pa;
+        uint32_t *ppn;
         if(satp >> 31 == 0)
             pa = (uint64_t)va;
         else
         {
-            if(R_TLB.is_in_cache(va >> 12))
-            {
-                pa = (R_TLB.get(va >> 12) << 12) | (va & 0xfff);
-            }
-            else
+            ppn = R_TLB.get(va >> 12);
+            if(ppn == NULL)
             {
                 pa = Translate(va, READ);
                 R_TLB.put(va >> 12, pa >> 12);
             }
+            else
+                pa = (*ppn << 12) | (va & 0xfff);
         }
 
         return ReadWordPhys(pa);
@@ -174,19 +174,19 @@ public:
     uint32_t Fetch(uint32_t va)
     {
         uint64_t pa;
+        uint32_t *ppn;
         if(satp >> 31 == 0)
             pa = (uint64_t)va;
         else
         {
-            if(X_TLB.is_in_cache(va >> 12))
-            {
-                pa = (X_TLB.get(va >> 12) << 12) | (va & 0xfff);
-            }
-            else
+            ppn = X_TLB.get(va >> 12);
+            if(ppn == NULL)
             {
                 pa = Translate(va, EXEC);
                 X_TLB.put(va >> 12, pa >> 12);
             }
+            else
+                pa = (*ppn << 12) | (va & 0xfff);
         }
 
         return ReadWordPhys(pa);
@@ -207,19 +207,19 @@ public:
     uint16_t ReadHalfWord(uint32_t va)
     {
         uint64_t pa;
+        uint32_t *ppn;
         if(satp >> 31 == 0)
             pa = (uint64_t)va;
         else
         {
-            if(R_TLB.is_in_cache(va >> 12))
-            {
-                pa = (R_TLB.get(va >> 12) << 12) | (va & 0xfff);
-            }
-            else
+            ppn = R_TLB.get(va >> 12);
+            if(ppn == NULL)
             {
                 pa = Translate(va, READ);
                 R_TLB.put(va >> 12, pa >> 12);
             }
+            else
+                pa = (*ppn << 12) | (va & 0xfff);
         }
 
         return ReadHalfWordPhys(pa);
@@ -235,19 +235,19 @@ public:
     uint8_t ReadByte(uint32_t va)
     {
         uint64_t pa;
+        uint32_t *ppn;
         if(satp >> 31 == 0)
             pa = (uint64_t)va;
         else
         {
-            if(R_TLB.is_in_cache(va >> 12))
-            {
-                pa = (R_TLB.get(va >> 12) << 12) | (va & 0xfff);
-            }
-            else
+            ppn = R_TLB.get(va >> 12);
+            if(ppn == NULL)
             {
                 pa = Translate(va, READ);
                 R_TLB.put(va >> 12, pa >> 12);
             }
+            else
+                pa = (*ppn << 12) | (va & 0xfff);
         }
 
         return ReadBytePhys(pa);
