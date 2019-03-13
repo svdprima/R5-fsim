@@ -26,6 +26,7 @@ Instruction Decoder::Decode (uint32_t raw_instr)
         dec_instr.SetImm(dec_instr.GetImm() | (0b10000000000000000000000000000000 & raw_instr) >> 12);
         if (0b10000000000000000000000000000000 & raw_instr) //sign extension
             dec_instr.SetImm(dec_instr.GetImm() | 0b11111111111100000000000000000000); 
+        dec_instr.SetBBEnd(false);
     }
     else if (dec_instr.GetOppcode() == 0b0110011)
     {
@@ -47,6 +48,8 @@ Instruction Decoder::Decode (uint32_t raw_instr)
         dec_instr.SetImm((0b11111111111100000000000000000000 & raw_instr) >> 20);
         if (dec_instr.GetImm() & 0b100000000000)
             dec_instr.SetImm(dec_instr.GetImm() | 0b11111111111111111111000000000000);
+        if (dec_instr.GetOppcode() == 0b1100111 || (dec_instr.GetOppcode() == 0b1110011 && !dec_instr.GetFunct3()))
+            dec_instr.SetBBEnd(false);
     }
     else if (dec_instr.GetOppcode() == 0b0100011)
     {
@@ -71,6 +74,7 @@ Instruction Decoder::Decode (uint32_t raw_instr)
         dec_instr.SetImm(dec_instr.GetImm() | (0b10000000000000000000000000000000 & raw_instr) >> 20);
         if (dec_instr.GetImm() & 0b100000000000)
             dec_instr.SetImm (dec_instr.GetImm() | 0b11111111111111111111000000000000);
+        dec_instr.SetBBEnd(false);
     }
     uint8_t cmd_id = (dec_instr.GetOppcode() >> 2) | (dec_instr.GetFunct3() << 5);
     if (!dec_instr.GetFunct7())

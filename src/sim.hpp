@@ -1,6 +1,7 @@
 #ifndef SIM_HPP
 #define SIM_HPP
 
+#include <vector>
 #include "hart_state.h"
 #include "decoder.hpp"
 #include "aux.hpp"
@@ -8,7 +9,7 @@
 class BasicBlock
 {
 private:
-    static constexpr uint32_t block_size = 16; //not including BASICBLOCK DUMMY
+    static constexpr uint32_t block_size = 4; //not including BASICBLOCK DUMMY
     std::array<Instruction, block_size + 1> instructions;
 public:
     BasicBlock() = default;
@@ -26,7 +27,7 @@ private:
 public:
     Sim (HartState &h_state) : InstrCache(cache_size), hart_state(h_state)
     {};
-    void Execute (bool verbose);
+    void Execute ();
 };
 
 #endif

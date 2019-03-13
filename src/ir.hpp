@@ -63,18 +63,11 @@ private:
     uint8_t rs1;
     uint8_t rs2;
     uint8_t funct7;
+    bool    BBEnd;
 public:
     InstrType type;
-    Instruction ()
+    Instruction () : imm(0), oppcode(0), rd(0), funct3(0), rs1(0), rs2(0), funct7(0), BBEnd(true), type(InstrType::Undefined)
     {
-        oppcode = 0;
-        rd      = 0;
-        funct3  = 0;
-        rs1     = 0;
-        rs2     = 0;
-        funct7  = 0;
-        imm     = 0;
-        type = InstrType::Undefined;
     }
     void ExecCommand (const Instruction* first_instr, HartState* hart_state) const;
     void SetOppcode (uint8_t oppc);
@@ -88,6 +81,10 @@ public:
     {
         command_name = c_name;
         cmd = command;
+    }
+    void SetBBEnd(bool value)
+    {
+        BBEnd = value;
     }
     void PrintInstr (const bool is_verbose) const;
 
@@ -125,6 +122,10 @@ public:
     inline uint32_t GetImm () const
     {
         return imm;
+    }
+    inline bool GetBBEnd () const
+    {
+        return BBEnd;
     }
 };
 

@@ -2,7 +2,7 @@
 #include <stdexcept>
 #include "sim.hpp"
 
-void Sim::Execute (bool is_verbose)
+void Sim::Execute ()
 {
     std::chrono::high_resolution_clock::time_point t_start = std::chrono::high_resolution_clock::now();
     Instruction dec_instr;
@@ -75,7 +75,7 @@ void Sim::Execute (bool is_verbose)
     printf ("%u instructions executed\n", hart_state.GetCmdCount());
     printf ("The execution time is %lf seconds\n", ex_time.count());
     printf ("Simulation speed is %.02lf MIPS\n", hart_state.GetCmdCount() / ex_time.count() / 1000000);
-    printf ("Basic Block rate is %02lf, miss rate is %02lf\n", 
+    printf ("Basic Block hit rate is %.06lf\n\t   miss rate is %.06lf\n", 
     (double)(InstrCache.GetHitCount())  / ((double)(InstrCache.GetHitCount() + InstrCache.GetMissCount())),
     (double)(InstrCache.GetMissCount()) / ((double)(InstrCache.GetHitCount() + InstrCache.GetMissCount())));
 }
@@ -83,21 +83,15 @@ void Sim::Execute (bool is_verbose)
 BasicBlock::BasicBlock (HartState &h_state, Decoder &DCD)
 {
     uint32_t i = 0;
-    uint32_t oppc = 0;
     uint32_t cur_instr = 0;
     do 
     {
         cur_instr = h_state.Fetch(h_state.GetPc() + 4 * i);
         instructions[i] = DCD.Decode(cur_instr);
-        oppc = instructions[i].GetOppcode();
         i++;
     }
-    while ((i < block_size) &&  oppc != 0b1101111
-                                      &&  oppc != 0b1100111
-                                      &&  oppc != 0b1100011
-                                      && (oppc != 0b1110011
-                    ||  instructions.at(i - 1).GetFunct3()));
-    instructions[block_size].SetCommand("BASIC", &BASICDUMMY);
+    while ((i < block_size) && instructions[i - 1].GetBBEnd());
+    instructions[i].SetCommand("BASIC", &BASICDUMMY);
 }
 
 inline void BasicBlock::ExecuteBlock (HartState& h_state)

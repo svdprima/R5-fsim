@@ -20,7 +20,6 @@ int main(int argc, char** argv)
     HartState hart_state(PC, words, n_pages);
     
     Sim sim = Sim (hart_state);
-    bool is_verbose = true;
-    sim.Execute (is_verbose);
+    sim.Execute ();
     return 0;
 }
