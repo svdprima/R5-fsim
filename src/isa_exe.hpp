@@ -9,19 +9,27 @@
 
 #define PC_incr hart_state->SetPc(GET_PC() + 4)
 #define RDn cur_instr->GetRd()
+#define eRDn cur_instr->GetRd_2()
 #define RDv  (hart_state->GetReg(cur_instr->GetRd()))
 #define RS1n cur_instr->GetRs1()
 #define RS1v (hart_state->GetReg(cur_instr->GetRs1()))
+#define eRS1v (hart_state->GetReg(cur_instr->GetRs1_2()))
 #define RS2n cur_instr->GetRs2()
 #define RS2v (hart_state->GetReg(cur_instr->GetRs2()))
+#define eRS2v (hart_state->GetReg(cur_instr->GetRs2_2()))
 #define SET_PC(x) (hart_state->SetPc(x))
 #define GET_PC()  (hart_state->GetPc())
 #define SET_R(x, val) (hart_state->SetReg(x, val))
 #define GET_R(x) (hart_state->GetReg(x));
 #define IMM cur_instr->GetImm()
+#define eIMM cur_instr->GetImm_2()
 #define NEXT_INSTR \
 { \
     (cur_instr + 1)->ExecCommand(first_instr, hart_state); \
+}
+#define NEXT_2_INSTR \
+{ \
+    (cur_instr + 2)->ExecCommand(first_instr, hart_state); \
 }
 #define GET_SATP() hart_state->GetSatp()
 #define SET_SATP(x) hart_state->SetSatp(x)
@@ -272,12 +280,12 @@ void ANDExec    (const Instruction* first_instr, const Instruction* cur_instr, H
     NEXT_INSTR;
 }
 
-void DUMMYExec  ([[maybe_unused]]const Instruction* first_instr,[[maybe_unused]] const Instruction* cur_instr, [[maybe_unused]]HartState* hart_state)
+void DUMMYExec  ([[maybe_unused]] const Instruction* first_instr, [[maybe_unused]] const Instruction* cur_instr, [[maybe_unused]] HartState* hart_state)
 {
     throw DummyException("DUMMY instruction\n");
 }
 
-void ECALLExec  ([[maybe_unused]]const Instruction* first_instr, [[maybe_unused]]const Instruction* cur_instr, [[maybe_unused]]HartState* hart_state)
+void ECALLExec  ([[maybe_unused]] const Instruction* first_instr,[[maybe_unused]] const Instruction* cur_instr,[[maybe_unused]] HartState* hart_state)
 {
     CMD_incr(cur_instr - first_instr + 1);
     throw FinishException ("Finished execution!\n");
@@ -393,6 +401,20 @@ void CSRRCIExec (const Instruction* first_instr, const Instruction* cur_instr, H
     SET_R(RDn, GET_SATP());
     SET_SATP(GET_SATP() | (!static_cast<uint32_t>(RS1n)));
     NEXT_INSTR;
+}
+
+void LWADDIExec (const Instruction* first_instr, const Instruction* cur_instr, HartState* hart_state)
+{
+    SET_R(RDn, static_cast<int32_t>(hart_state->ReadWord (IMM + RS1v)));
+    SET_R(eRDn, eRS1v + static_cast<int32_t>(eIMM)); 
+    NEXT_2_INSTR;
+}
+
+void SLLIADDExec (const Instruction* first_instr, const Instruction* cur_instr, HartState* hart_state)
+{
+    SET_R(RDn, RS1v << (IMM & 0b11111));
+    SET_R(eRDn, eRS1v + eRS2v);
+    NEXT_2_INSTR;
 }
 
 #endif

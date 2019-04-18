@@ -1,5 +1,6 @@
 #include <chrono>
 #include <stdexcept>
+#include <algorithm>
 #include "sim.hpp"
 
 void Sim::Execute ()
@@ -73,7 +74,7 @@ void Sim::Execute ()
     (double)(InstrCache.GetMissCount()) / ((double)(InstrCache.GetHitCount() + InstrCache.GetMissCount())));
 }
 
-BasicBlock::BasicBlock (HartState &h_state, Decoder &DCD)
+BasicBlock::BasicBlock (HartState &h_state, Decoder &DCD) noexcept
 {
     uint32_t i = 0;
     uint32_t cur_instr = 0;
@@ -85,6 +86,26 @@ BasicBlock::BasicBlock (HartState &h_state, Decoder &DCD)
     }
     while ((i < block_size) && instructions[i - 1].GetBBEnd());
     instructions[i].SetCommand("BASIC", &BASICDUMMY);
+    auto j = instructions.begin();
+    while ((j + 1)->GetCmd() != &BASICDUMMY)
+    {
+        if (j->GetCmd() == &LWExec && (j + 1)->GetCmd() == &ADDIExec)
+        {
+            j->SetRd_2((j + 1)->GetRd());
+            j->SetRs1_2((j + 1)->GetRs1());
+            j->SetImm_2((j + 1)->GetImm());
+            j->SetCommand("LWADDI", &LWADDIExec);
+            //std::copy(j + 2, instructions.end(), j + 1);
+        }
+        else if (j->GetCmd() == &SLLIExec && (j + 1)->GetCmd() == &ADDExec)
+        {
+            j->SetRd_2((j + 1)->GetRd());
+            j->SetRs1_2((j + 1)->GetRs1());
+            j->SetRs2_2((j + 1)->GetRs2());
+            j->SetCommand("SLLIADD", &SLLIADDExec);
+        }
+        j++;
+    }
 }
 
 inline void BasicBlock::ExecuteBlock (HartState& h_state)

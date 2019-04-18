@@ -27,18 +27,16 @@ public:
                 regs[i] = 0x4ffc; //initialising stack pointer
         }
     }
-    void SetPc(uint32_t pc_value)
+    void SetPc(uint32_t pc_value) noexcept
     {
         pc = pc_value;
     }
-    void SetSatp(uint32_t satp_value)
+    void SetSatp(uint32_t satp_value) noexcept
     {
         _MMU.SetSatp(satp_value);
     }
-    void SetReg(uint8_t reg_num, uint32_t reg_value)
+    void SetReg(uint8_t reg_num, uint32_t reg_value) noexcept
     {
-        if(reg_num > 32)
-            throw RegException("Register number is bigger than 32.\n");
         if(reg_num != 0)
             regs[reg_num] = reg_value;
     }
@@ -58,21 +56,19 @@ public:
     {
         _MMU.MemDump();
     }
-    inline uint32_t GetPc()
+    inline uint32_t GetPc() noexcept
     {
         return pc;
     }
-    inline uint32_t GetSatp()
+    inline uint32_t GetSatp() noexcept
     {
         return _MMU.GetSatp();
     }
-    inline uint32_t GetReg(uint8_t reg_num)
+    inline uint32_t GetReg(uint8_t reg_num) noexcept
     {
-        if(reg_num > 32)
-            throw RegException("Register number is bigger than 32.\n");
         return regs[reg_num];
     }
-    inline uint32_t ReadWord(uint32_t va)
+    inline uint32_t ReadWord(uint32_t va) 
     {
         return _MMU.ReadWord(va);
     }
@@ -106,11 +102,11 @@ public:
     {
         printf ("Word at specified adress: %x\n", ReadWord(va));
     }
-    inline void IncreaseCmdCount(uint32_t incr)
+    inline void IncreaseCmdCount(uint32_t incr) noexcept
     {
         cmd_counter += incr;
     }
-    inline uint32_t GetCmdCount ()
+    inline uint32_t GetCmdCount () noexcept
     {
         return cmd_counter;
     }

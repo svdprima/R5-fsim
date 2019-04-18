@@ -5,6 +5,7 @@
 #include "hart_state.h"
 #include "decoder.hpp"
 #include "aux.hpp"
+#include "simple_cache.h"
 
 class BasicBlock
 {
@@ -13,19 +14,18 @@ private:
     std::array<Instruction, block_size + 1> instructions;
 public:
     BasicBlock() = default;
-    BasicBlock (HartState& h_state, Decoder& DCD);
+    BasicBlock (HartState& h_state, Decoder& DCD) noexcept;
     void ExecuteBlock (HartState& h_state);
 };
 
 class Sim
 {
 private:
-    LRUCache<uint32_t, BasicBlock> InstrCache;
+    SimpleCache<uint32_t, BasicBlock> InstrCache;
     HartState hart_state;
     Decoder DCD;
-    static constexpr uint8_t cache_size  = 128;
 public:
-    Sim (HartState &h_state) : InstrCache(cache_size), hart_state(h_state)
+    Sim (HartState &h_state) : InstrCache(), hart_state(h_state)
     {};
     void Execute ();
 };

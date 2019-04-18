@@ -55,77 +55,156 @@ class Instruction
 {
 private:
     uint32_t imm;
+    uint32_t imm_2;
     void (*cmd) (const Instruction*, const Instruction*, HartState*);
     const char* command_name;
-    uint8_t oppcode;
     uint8_t rd;
-    uint8_t funct3;
     uint8_t rs1;
     uint8_t rs2;
-    uint8_t funct7;
+    uint8_t rd_2;
+    uint8_t rs1_2;
+    uint8_t rs2_2;
+    uint64_t foo;
+    uint64_t foo2;
+    uint64_t foo3;
+    uint64_t foo4; //64-byte alignment
     bool    BBEnd;
 public:
     InstrType type;
-    Instruction () : imm(0), oppcode(0), rd(0), funct3(0), rs1(0), rs2(0), funct7(0), BBEnd(true), type(InstrType::Undefined)
+    Instruction () : imm(0), imm_2(0), rd(0), rs1(0), rs2(0), rd_2(0), rs1_2(0), rs2_2(0), BBEnd(true), type(InstrType::Undefined)
     {
     }
-    void ExecCommand (const Instruction* first_instr, HartState* hart_state) const;
-    void SetOppcode (uint8_t oppc);
-    void SetRd (uint8_t RD);
-    void SetFunct3 (uint8_t f3);
-    void SetRs1 (uint8_t RS1);
-    void SetRs2 (uint8_t RS2);
-    void SetFunct7 (uint8_t f7);
-    void SetImm (uint32_t _imm);
-    void SetCommand (const char* c_name, void (*command) (const Instruction*, const Instruction*, HartState*))
+    inline void ExecCommand (const Instruction* first_instr, HartState* hart_state) const
+    {
+        cmd (first_instr, this, hart_state);
+    }
+    inline void SetRd (uint8_t RD)
+    {
+        rd = RD;
+    }
+    inline void SetRd_2 (uint8_t RD_2)
+    {
+        rd_2 = RD_2;
+    }
+    inline void SetRs1 (uint8_t RS1)
+    {
+        rs1 = RS1;
+    }
+    inline void SetRs1_2 (uint8_t RS1_2)
+    {
+        rs1_2 = RS1_2;
+    }
+    inline void SetRs2 (uint8_t RS2)
+    {
+        rs2 = RS2;
+    }
+    inline void SetRs2_2 (uint8_t RS2_2)
+    {
+        rs2_2 = RS2_2;
+    }
+    inline void SetImm_2 (uint32_t _imm_2)
+    {
+        imm_2 = _imm_2;
+    }
+    inline void SetImm (uint32_t _imm)
+    {
+        imm = _imm;
+    }
+    inline void SetCommand (const char* c_name, void (*command) (const Instruction*, const Instruction*, HartState*))
     {
         command_name = c_name;
         cmd = command;
     }
-    void SetBBEnd(bool value)
+    inline void SetBBEnd(bool value)
     {
         BBEnd = value;
     }
-    void PrintInstr (const bool is_verbose) const;
-
-    inline uint8_t GetOppcode () const
+    void PrintInstr (const bool is_verbose) const
     {
-        return oppcode;
-    }
-
+        printf ("%s\n", command_name);
+        if (is_verbose)
+        {
+            switch (type)
+            {
+                case InstrType::RType:
+                    printf ("RType\n");
+                    printf ("rd     : %u\n", rd);
+                    printf ("rs1    : %u\n", rs1);
+                    printf ("rs2    : %u\n", rs2);
+                    break;
+                case InstrType::IType:
+                    printf ("IType\n");
+                    printf ("rd     : %u\n", rd);
+                    printf ("rs1    : %u\n", rs1);
+                    printf ("imm    : %x\n", imm);
+                    break;
+                case InstrType::SType:
+                    printf ("SType\n");
+                    printf ("rs1    : %u\n", rs1);
+                    printf ("rs2    : %u\n", rs2);
+                    printf ("imm    : %x\n", imm);
+                    break;
+                case InstrType::BType:
+                    printf ("BType\n");
+                    printf ("rs1    : %u\n", rs1);
+                    printf ("rs2    : %u\n", rs2);
+                    printf ("imm    : %x\n", imm);
+                    break;
+                case InstrType::UType:
+                    printf ("UType\n");
+                    printf ("rd     : %u\n", rd);
+                    printf ("imm    : %x\n", imm);
+                    break;
+                case InstrType::JType:
+                    printf ("JType\n");
+                    printf ("rd     : %u\n", rd);
+                    printf ("imm    : %x\n", imm);
+                    break;
+                default:
+                    printf ("Type is undefined\n");
+            }
+            printf ("\n");
+        }
+    }    
     inline uint8_t GetRd () const
     {
         return rd;
     }
-
-    inline uint8_t GetFunct3 () const
+    inline uint8_t GetRd_2 () const
     {
-        return funct3;
+        return rd_2;
     }
-
     inline uint8_t GetRs1 () const
-
     {
         return rs1;
     }
-
+    inline uint8_t GetRs1_2 () const
+    {
+        return rs1_2;
+    }
     inline uint8_t GetRs2 () const
     {
         return rs2;
     }
-
-    inline uint8_t GetFunct7 () const
+    inline uint8_t GetRs2_2 () const
     {
-        return funct7;
+        return rs2_2;
     }
-
     inline uint32_t GetImm () const
     {
         return imm;
     }
+    inline uint32_t GetImm_2 () const
+    {
+        return imm_2;
+    }
     inline bool GetBBEnd () const
     {
         return BBEnd;
+    }
+    inline void (*GetCmd())(const Instruction*, const Instruction*, HartState*)
+    {
+        return cmd;
     }
 };
 
