@@ -45,12 +45,16 @@ public:
     
     void WriteWordPhys(uint64_t pa, uint32_t data)
     {
+        /*
         if(pa+3 > max_pa)
             throw OutOfMemException("Out of physical memory.\n", pa);
-        if((pa & 0b11) == 0b00)
+            */
+        //if((pa & 0b11) == 0b00)
             mem[pa>>2] = data;
+        /*
         else
             throw UnalignException("Unaligned word access.\n", pa);
+            */
     }
     void WriteWord(uint32_t va, uint32_t data)
     {
@@ -144,12 +148,16 @@ public:
 
     uint32_t ReadWordPhys(uint64_t pa)
     {
+        /*
         if(pa+3 > max_pa)
             throw OutOfMemException("Out of physical memory.\n", pa);
-        if((pa & 0b11) == 0b00)
+            */
+       // if((pa & 0b11) == 0b00)
             return mem[pa>>2];
+            /*
         else
             throw UnalignException("Unaligned word access.\n", pa);
+            */
     }
     uint32_t ReadWord(uint32_t va)
     {

@@ -1,6 +1,6 @@
 #include "mmu.h"
 
-#define N 18
+#define N 15
 
 int isSafe(int board[N][N], int row, int col) 
 { 

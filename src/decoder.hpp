@@ -70,6 +70,11 @@ void REMExec    (const Instruction* first_instr, const Instruction* cur_instr, H
 void REMUExec   (const Instruction* first_instr, const Instruction* cur_instr, HartState* hart_state);
 void DUMMYExec  (const Instruction* first_instr, const Instruction* cur_instr, HartState* hart_state);
 
+//Two-in-one merged instructions
+
+void LWADDIExec (const Instruction* first_instr, const Instruction* cur_instr, HartState* hart_state);
+void SLLIADDExec (const Instruction* first_instr, const Instruction* cur_instr, HartState* hart_state);
+
 struct CommandDescription
 {
     const char* c_name;
