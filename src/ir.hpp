@@ -64,10 +64,6 @@ private:
     uint8_t rd_2;
     uint8_t rs1_2;
     uint8_t rs2_2;
-    uint64_t foo;
-    uint64_t foo2;
-    uint64_t foo3;
-    uint64_t foo4; //64-byte alignment
     bool    BBEnd;
 public:
     InstrType type;

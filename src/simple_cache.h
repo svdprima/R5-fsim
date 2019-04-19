@@ -4,58 +4,53 @@
 template<typename key_t, typename value_t>
 class SimpleCache
 {
-private:
+public:
     static constexpr uint8_t cache_size = 32;
-    std::array<std::pair<key_t, value_t>, cache_size> items_array;
-    std::map<key_t, unsigned int> items_map;
+    typedef typename std::pair<key_t, value_t> key_value_pair_t;
+    typedef typename std::array<key_value_pair_t, cache_size>::iterator array_iterator_t;
+private:
+    std::array<key_value_pair_t, cache_size> items_array;
+    std::map<key_t, array_iterator_t> items_map;
     unsigned int end;
     unsigned int numel;
     size_t hits;
     size_t misses;
 public:
     SimpleCache() : end(0), numel(0) {}
-    void put (const key_t& key, const value_t& value) noexcept
+    void put (const key_t& key, const value_t& value)
     {
-        auto ind = items_map.find(key);
-        if (ind == items_map.end())
+        auto it = items_map.find(key);
+        if (it == items_map.end())
         {
             if (numel != cache_size)
-            {
-                items_array[end] = std::make_pair(key, value);
-                items_map.insert(std::make_pair(key, end));
                 numel++;
-                end = (end + 1) % cache_size;
-            }
             else 
-            {
-                items_map.erase(items_array[end].first);
-                items_array[end] = std::make_pair(key, value);
-                items_map.insert(std::make_pair(key, end));
-                end = (end + 1) % cache_size;
-            }
-        }
-        else
-        {
-            items_array[end].second = value;
+                items_map.erase((items_array.begin() + end)->first);
+
+            *(items_array.begin() + end) = std::make_pair(key, value);
+            items_map.insert(std::make_pair(key, items_array.begin() + end));
+            end = (end + 1) % cache_size;
         }
     }
-    inline bool is_in_cache (const key_t& key) noexcept
-    {
-        return items_map.find(key) != items_map.end();
-    }
+    
     value_t* get (const key_t& key)
     {
-        auto ind = items_map.find(key);
-        if (ind == items_map.end())
+        auto it = items_map.find(key);
+        if (it != items_map.end())
         {
-            misses++;
-            return NULL;
+            hits++;
+            return &(it->second->second);
         }
         else
         {
-            hits++;
-            return &(items_array[ind->second].second);
+            misses++;
+            return NULL;   
         }
+    }
+
+    inline bool is_in_cache (const key_t& key)
+    {
+        return items_map.find(key) != items_map.end();
     }
 
     inline uint64_t GetMissCount ()
