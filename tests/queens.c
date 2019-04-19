@@ -1,4 +1,4 @@
-#define N 15
+#define N 17
 
 int isSafe(int board[N][N], int row, int col) 
 { 

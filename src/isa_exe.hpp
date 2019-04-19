@@ -9,20 +9,24 @@
 
 #define PC_incr hart_state->SetPc(GET_PC() + 4)
 #define RDn cur_instr->GetRd()
-#define eRDn cur_instr->GetRd_2()
+#define sRDn cur_instr->GetRd_2()
+#define tRDn cur_instr->GetRd_3()
 #define RDv  (hart_state->GetReg(cur_instr->GetRd()))
 #define RS1n cur_instr->GetRs1()
 #define RS1v (hart_state->GetReg(cur_instr->GetRs1()))
-#define eRS1v (hart_state->GetReg(cur_instr->GetRs1_2()))
+#define sRS1v (hart_state->GetReg(cur_instr->GetRs1_2()))
+#define tRS1v (hart_state->GetReg(cur_instr->GetRs1_3()))
 #define RS2n cur_instr->GetRs2()
 #define RS2v (hart_state->GetReg(cur_instr->GetRs2()))
-#define eRS2v (hart_state->GetReg(cur_instr->GetRs2_2()))
+#define sRS2v (hart_state->GetReg(cur_instr->GetRs2_2()))
+#define tRS2v (hart_state->GetReg(cur_instr->GetRs2_3()))
 #define SET_PC(x) (hart_state->SetPc(x))
 #define GET_PC()  (hart_state->GetPc())
 #define SET_R(x, val) (hart_state->SetReg(x, val))
 #define GET_R(x) (hart_state->GetReg(x));
 #define IMM cur_instr->GetImm()
-#define eIMM cur_instr->GetImm_2()
+#define sIMM cur_instr->GetImm_2()
+#define tIMM cur_instr->GetImm_3()
 #define NEXT_INSTR \
 { \
     (cur_instr + 1)->ExecCommand(first_instr, hart_state); \
@@ -30,6 +34,10 @@
 #define NEXT_2_INSTR \
 { \
     (cur_instr + 2)->ExecCommand(first_instr, hart_state); \
+}
+#define NEXT_3_INSTR \
+{ \
+    (cur_instr + 3)->ExecCommand(first_instr, hart_state); \
 }
 #define GET_SATP() hart_state->GetSatp()
 #define SET_SATP(x) hart_state->SetSatp(x)
@@ -403,18 +411,36 @@ void CSRRCIExec (const Instruction* first_instr, const Instruction* cur_instr, H
     NEXT_INSTR;
 }
 
+/*
 void LWADDIExec (const Instruction* first_instr, const Instruction* cur_instr, HartState* hart_state)
 {
     SET_R(RDn, static_cast<int32_t>(hart_state->ReadWord (IMM + RS1v)));
-    SET_R(eRDn, eRS1v + static_cast<int32_t>(eIMM)); 
+    SET_R(sRDn, nRS1v + static_cast<int32_t>(eIMM)); 
     NEXT_2_INSTR;
 }
 
 void SLLIADDExec (const Instruction* first_instr, const Instruction* cur_instr, HartState* hart_state)
 {
     SET_R(RDn, RS1v << (IMM & 0b11111));
-    SET_R(eRDn, eRS1v + eRS2v);
+    SET_R(sRDn, nRS1v + nRS2v);
     NEXT_2_INSTR;
+}
+*/
+
+void SLLIADDLWExec (const Instruction* first_instr, const Instruction* cur_instr, HartState* hart_state)
+{
+    SET_R(RDn, RS1v << (IMM & 0b11111));
+    SET_R(sRDn, sRS1v + sRS2v);
+    SET_R(tRDn, static_cast<int32_t>(hart_state->ReadWord (tIMM + tRS1v)));
+    NEXT_3_INSTR;
+}
+
+void ADDISWLWExec (const Instruction* first_instr, const Instruction* cur_instr, HartState* hart_state)
+{
+    SET_R(RDn, RS1v + static_cast<int32_t>(IMM)); 
+    hart_state->WriteWord (sIMM + static_cast<int32_t>(sRS1v), sRS2v);
+    SET_R(tRDn, static_cast<int32_t>(hart_state->ReadWord (tIMM + tRS1v)));
+    NEXT_3_INSTR;
 }
 
 #endif
