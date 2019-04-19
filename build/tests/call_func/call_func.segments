@@ -1,14 +1,14 @@
 
-Elf file type is EXEC (Executable file)
-Entry point 0x10074
-There are 2 program headers, starting at offset 52
+Тип файла ELF — EXEC (Исполняемый файл)
+Точка входа 0x10074
+Имеется 2 заголовка программы, начиная со смещения 52
 
-Program Headers:
-  Type           Offset   VirtAddr   PhysAddr   FileSiz MemSiz  Flg Align
-  LOAD           0x000000 0x00010000 0x00010000 0x000e8 0x000e8 R E 0x1000
-  GNU_STACK      0x000000 0x00000000 0x00000000 0x00000 0x00000 RW  0x10
+Заголовки программы:
+  Тип            Смещ.    Вирт.адр   Физ.адр    Рзм.фйл Рзм.пм  Флг Выравн
+  LOAD           0x000000 0x00010000 0x00010000 0x00604 0x00604 R E 0x1000
+  LOAD           0x000604 0x00011604 0x00011604 0x00440 0x0045c RW  0x1000
 
- Section to Segment mapping:
-  Segment Sections...
+ Соответствие раздел-сегмент:
+  Сегмент Разделы...
    00     .text 
-   01     
+   01     .eh_frame .init_array .fini_array .data .sdata .bss 

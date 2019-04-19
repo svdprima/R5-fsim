@@ -16,13 +16,13 @@ READELF = riscv32-unknown-elf-readelf
 RISCV_CFLAGS = -mabi=ilp32 -march=rv32im
 
 CC = g++
-CFLAGS = -Wall -Wextra -O2
+CFLAGS = -Wall -Wextra -m64 -Ofast -march=native -funroll-all-loops #-flto
 LDFLAGS =
 LIBS = -lelf
 
 
 
-run: build_src build_test
+run:
 	@$(BUILD_SRC)/simulator $(BUILD_TEST)/$(TEST).elf
 
 
@@ -33,6 +33,8 @@ debug: build_src build_test
 $(BUILD_SRC)/simulator $(BUILD_TEST)/$(TEST).elf
 	@kcachegrind $(BUILD_SRC)/callgrind.out
 
+
+build_all: build_src build_test
 
 
 build_test: $(BUILD_TEST)/$(TEST).lst $(BUILD_TEST)/$(TEST).bin $(BUILD_TEST)/$(TEST).segments

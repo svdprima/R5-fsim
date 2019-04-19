@@ -1,3 +1,78 @@
+/*#ifndef LRU_CACHE_H
+#define LRU_CACHE_H
+
+#include <algorithm>
+#include <list>
+#include <stdexcept>
+
+template<typename key_t, typename value_t>
+class LRUCache
+{
+public:
+	typedef typename std::pair<key_t, value_t> key_value_pair_t;
+	typedef typename std::list<key_value_pair_t>::iterator list_iterator_t;
+
+private:
+	std::list<key_value_pair_t> _cache_items_list;
+	size_t _max_size;
+    uint64_t hits;
+    uint64_t misses;
+
+public:
+    LRUCache(size_t max_size) : _max_size(max_size), hits(0), misses(0) {}
+
+    void put(const key_t& key, const value_t& value)
+    {
+		auto it = std::find_if(_cache_items_list.begin(), _cache_items_list.end(),
+					[key](key_value_pair_t const &b) {return b.first == key;} );
+		_cache_items_list.push_front(key_value_pair_t(key, value));
+		if (it != _cache_items_list.end())
+			_cache_items_list.erase(it);
+		
+		if (_cache_items_list.size() > _max_size)
+		{
+			auto last = _cache_items_list.end();
+			last--;
+			_cache_items_list.pop_back();
+		}
+	}
+
+    bool is_in_cache (const key_t& key)
+    {
+    	auto it = std::find_if(_cache_items_list.begin(), _cache_items_list.end(),
+					[key](key_value_pair_t const &b) {return b.first == key;} );
+        return !(it == _cache_items_list.end());
+    }
+	
+	value_t* get(const key_t& key)
+	{
+		auto it = std::find_if(_cache_items_list.begin(), _cache_items_list.end(),
+					[key](key_value_pair_t const &b) {return b.first == key;} );
+		if (it == _cache_items_list.end())
+		{
+			misses++;
+			return NULL;
+		}
+		else
+		{
+			_cache_items_list.splice(_cache_items_list.begin(), _cache_items_list, it);
+			hits++;
+			return &(it->second);
+		}
+	}
+
+    inline uint32_t GetMissCount ()
+    {
+        return misses;
+    }
+    inline uint32_t GetHitCount ()
+    {
+        return hits;
+    }
+};
+
+#endif*/
+
 #ifndef LRU_CACHE_H
 #define LRU_CACHE_H
 

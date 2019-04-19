@@ -12,7 +12,7 @@ class HartState
 private:
     uint32_t pc;
     uint32_t regs[32];
-    uint32_t cmd_counter;
+    uint64_t cmd_counter;
     MMU _MMU;
 public:
     HartState(uint32_t initial_pc, std::vector<uint32_t> &words, uint32_t n_pages)
@@ -27,16 +27,18 @@ public:
                 regs[i] = 0x4ffc; //initialising stack pointer
         }
     }
-    void SetPc(uint32_t pc_value) noexcept
+    void SetPc(uint32_t pc_value)
     {
         pc = pc_value;
     }
-    void SetSatp(uint32_t satp_value) noexcept
+    void SetSatp(uint32_t satp_value)
     {
         _MMU.SetSatp(satp_value);
     }
-    void SetReg(uint8_t reg_num, uint32_t reg_value) noexcept
+    void SetReg(uint8_t reg_num, uint32_t reg_value)
     {
+        //if(reg_num > 32)
+        //    throw RegException("Register number is bigger than 32.\n");
         if(reg_num != 0)
             regs[reg_num] = reg_value;
     }
@@ -56,19 +58,21 @@ public:
     {
         _MMU.MemDump();
     }
-    inline uint32_t GetPc() noexcept
+    inline uint32_t GetPc()
     {
         return pc;
     }
-    inline uint32_t GetSatp() noexcept
+    inline uint32_t GetSatp()
     {
         return _MMU.GetSatp();
     }
-    inline uint32_t GetReg(uint8_t reg_num) noexcept
+    inline uint32_t GetReg(uint8_t reg_num)
     {
+        //if(reg_num > 32)
+        //    throw RegException("Register number is bigger than 32.\n");
         return regs[reg_num];
     }
-    inline uint32_t ReadWord(uint32_t va) 
+    inline uint32_t ReadWord(uint32_t va)
     {
         return _MMU.ReadWord(va);
     }
@@ -102,11 +106,11 @@ public:
     {
         printf ("Word at specified adress: %x\n", ReadWord(va));
     }
-    inline void IncreaseCmdCount(uint32_t incr) noexcept
+    inline void IncreaseCmdCount(uint32_t incr)
     {
         cmd_counter += incr;
     }
-    inline uint32_t GetCmdCount () noexcept
+    inline uint32_t GetCmdCount ()
     {
         return cmd_counter;
     }
