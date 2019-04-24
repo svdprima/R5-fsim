@@ -1,23 +1,27 @@
+#ifndef SIMPLE_CACHE_H
+#define SIMPLE_CACHE_H
+
 #include <map>
 #include <array>
 
-template<typename key_t, typename value_t>
+template<typename value_t>
 class SimpleCache
 {
 public:
-    static constexpr uint8_t cache_size = 32;
-    typedef typename std::pair<key_t, value_t> key_value_pair_t;
+    static constexpr uint32_t cache_size = 512;
+    typedef typename std::pair<uint32_t, value_t> key_value_pair_t;
     typedef typename std::array<key_value_pair_t, cache_size>::iterator array_iterator_t;
 private:
     std::array<key_value_pair_t, cache_size> items_array;
-    std::map<key_t, array_iterator_t> items_map;
+    std::map<uint32_t, array_iterator_t> items_map;
+    std::array<key_value_pair_t, cache_size> direct_cache;
     unsigned int end;
     unsigned int numel;
     size_t hits;
     size_t misses;
 public:
     SimpleCache() : end(0), numel(0) {}
-    void put (const key_t& key, const value_t& value)
+    void put (const uint32_t& key, const value_t& value)
     {
         auto it = items_map.find(key);
         if (it == items_map.end())
@@ -33,22 +37,33 @@ public:
         }
     }
     
-    value_t* get (const key_t& key)
+    value_t* get (const uint32_t& key)
     {
-        auto it = items_map.find(key);
-        if (it != items_map.end())
+        uint32_t short_key = key & (cache_size-1);
+        array_iterator_t tmp_pair = &direct_cache[short_key];
+        if (key == tmp_pair->first)
         {
             hits++;
-            return &(it->second->second);
+            return &(tmp_pair->second);
         }
         else
         {
-            misses++;
-            return NULL;   
+            auto it = items_map.find(key);
+            if (it != items_map.end())
+            {
+                hits++;
+                *tmp_pair = *(it->second);
+                return &(it->second->second);
+            }
+            else
+            {
+                misses++;
+                return NULL;   
+            }
         }
     }
 
-    inline bool is_in_cache (const key_t& key)
+    inline bool is_in_cache (const uint32_t& key)
     {
         return items_map.find(key) != items_map.end();
     }
@@ -63,3 +78,6 @@ public:
         return hits;
     }
 };
+
+
+#endif //SIMPLE_CACHE_H

@@ -3,7 +3,6 @@
 
 #include <list>
 #include <map>
-#include <stdexcept>
 
 template<typename key_t, typename value_t>
 class LRUCache

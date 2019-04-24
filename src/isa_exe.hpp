@@ -31,14 +31,6 @@
 { \
     (cur_instr + 1)->ExecCommand(first_instr, hart_state); \
 }
-#define NEXT_2_INSTR \
-{ \
-    (cur_instr + 2)->ExecCommand(first_instr, hart_state); \
-}
-#define NEXT_3_INSTR \
-{ \
-    (cur_instr + 3)->ExecCommand(first_instr, hart_state); \
-}
 #define GET_SATP() hart_state->GetSatp()
 #define SET_SATP(x) hart_state->SetSatp(x)
 #define PRINT_SATP hart_state->PrintSatp()
@@ -409,38 +401,6 @@ void CSRRCIExec (const Instruction* first_instr, const Instruction* cur_instr, H
     SET_R(RDn, GET_SATP());
     SET_SATP(GET_SATP() | (!static_cast<uint32_t>(RS1n)));
     NEXT_INSTR;
-}
-
-/*
-void LWADDIExec (const Instruction* first_instr, const Instruction* cur_instr, HartState* hart_state)
-{
-    SET_R(RDn, static_cast<int32_t>(hart_state->ReadWord (IMM + RS1v)));
-    SET_R(sRDn, nRS1v + static_cast<int32_t>(eIMM)); 
-    NEXT_2_INSTR;
-}
-
-void SLLIADDExec (const Instruction* first_instr, const Instruction* cur_instr, HartState* hart_state)
-{
-    SET_R(RDn, RS1v << (IMM & 0b11111));
-    SET_R(sRDn, nRS1v + nRS2v);
-    NEXT_2_INSTR;
-}
-*/
-
-void SLLIADDLWExec (const Instruction* first_instr, const Instruction* cur_instr, HartState* hart_state)
-{
-    SET_R(RDn, RS1v << (IMM & 0b11111));
-    SET_R(sRDn, sRS1v + sRS2v);
-    SET_R(tRDn, static_cast<int32_t>(hart_state->ReadWord (tIMM + tRS1v)));
-    NEXT_3_INSTR;
-}
-
-void ADDISWLWExec (const Instruction* first_instr, const Instruction* cur_instr, HartState* hart_state)
-{
-    SET_R(RDn, RS1v + static_cast<int32_t>(IMM)); 
-    hart_state->WriteWord (sIMM + static_cast<int32_t>(sRS1v), sRS2v);
-    SET_R(tRDn, static_cast<int32_t>(hart_state->ReadWord (tIMM + tRS1v)));
-    NEXT_3_INSTR;
 }
 
 #endif

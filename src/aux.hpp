@@ -4,8 +4,6 @@
 #include <exception>
 #include <stdint.h>
 
-#define MAX_INSTR 100000000
-
 class FinishException: public std::exception
 {
 private:

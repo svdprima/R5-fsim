@@ -8,7 +8,6 @@ int main(int argc, char** argv)
 {
     if(argc != 2)
         errx(EXIT_FAILURE, "usage : %s elf_file", argv[0]);
-    printf ("Size of instr is %lu\n", sizeof(Instruction));
     Elf_reader ER;
     uint32_t PC = 0;
     std::vector<uint32_t> words;
@@ -17,7 +16,7 @@ int main(int argc, char** argv)
     ER.Load(words);
 
     PC = ER.Entry();
-    uint32_t n_pages = 200;
+    uint32_t n_pages = 24;
     HartState hart_state(PC, words, n_pages);
     
     Sim sim = Sim (hart_state);

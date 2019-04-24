@@ -54,27 +54,16 @@ const OppcodeDescr OppcodeType[] =
 class Instruction
 {
 private:
-    uint64_t foo1;
-    uint64_t foo2;
     uint32_t imm;
-    uint32_t imm_2;
-    uint32_t imm_3;
     void (*cmd) (const Instruction*, const Instruction*, HartState*);
     const char* command_name;
     uint8_t rd;
     uint8_t rs1;
     uint8_t rs2;
-    uint8_t rd_2;
-    uint8_t rs1_2;
-    uint8_t rs2_2;
-    uint8_t rd_3;
-    uint8_t rs1_3;
-    uint8_t rs2_3;
     bool    BBEnd;
 public:
     InstrType type;
-    Instruction () : imm(0), imm_2(0), imm_3(0), rd(0), rs1(0), rs2(0), rd_2(0),
-                     rs1_2(0), rs2_2(0), rd_3(0), rs1_3(0), rs2_3(0), BBEnd(true), type(InstrType::Undefined)
+    Instruction () : imm(0), rd(0), rs1(0), rs2(0), BBEnd(true), type(InstrType::Undefined)
     {
     }
     inline void ExecCommand (const Instruction* first_instr, HartState* hart_state) const
@@ -85,45 +74,13 @@ public:
     {
         rd = RD;
     }
-    inline void SetRd_2 (uint8_t RD_2)
-    {
-        rd_2 = RD_2;
-    }
-    inline void SetRd_3 (uint8_t RD_3)
-    {
-        rd_3 = RD_3;
-    }
     inline void SetRs1 (uint8_t RS1)
     {
         rs1 = RS1;
     }
-    inline void SetRs1_2 (uint8_t RS1_2)
-    {
-        rs1_2 = RS1_2;
-    }
-    inline void SetRs1_3 (uint8_t RS1_3)
-    {
-        rs1_3 = RS1_3;
-    }
     inline void SetRs2 (uint8_t RS2)
     {
         rs2 = RS2;
-    }
-    inline void SetRs2_2 (uint8_t RS2_2)
-    {
-        rs2_2 = RS2_2;
-    }
-    inline void SetRs2_3 (uint8_t RS2_3)
-    {
-        rs2_3 = RS2_3;
-    }
-    inline void SetImm_3 (uint32_t _imm_3)
-    {
-        imm_3 = _imm_3;
-    }
-    inline void SetImm_2 (uint32_t _imm_2)
-    {
-        imm_2 = _imm_2;
     }
     inline void SetImm (uint32_t _imm)
     {
@@ -189,49 +146,17 @@ public:
     {
         return rd;
     }
-    inline uint8_t GetRd_2 () const
-    {
-        return rd_2;
-    }
-    inline uint8_t GetRd_3 () const
-    {
-        return rd_3;
-    }
     inline uint8_t GetRs1 () const
     {
         return rs1;
-    }
-    inline uint8_t GetRs1_2 () const
-    {
-        return rs1_2;
-    }
-    inline uint8_t GetRs1_3 () const
-    {
-        return rs1_3;
     }
     inline uint8_t GetRs2 () const
     {
         return rs2;
     }
-    inline uint8_t GetRs2_2 () const
-    {
-        return rs2_2;
-    }
-    inline uint8_t GetRs2_3 () const
-    {
-        return rs2_3;
-    }
     inline uint32_t GetImm () const
     {
         return imm;
-    }
-    inline uint32_t GetImm_2 () const
-    {
-        return imm_2;
-    }
-    inline uint32_t GetImm_3 () const
-    {
-        return imm_2;
     }
     inline bool GetBBEnd () const
     {

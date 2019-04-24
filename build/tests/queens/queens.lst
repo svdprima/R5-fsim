@@ -1,8 +1,8 @@
 
-/home/semion/Documents/MIPT/Programms/RISCV/R5-fsim/build/tests/queens/queens.elf:     file format elf32-littleriscv
+/home/albert/Proga/risc-V/R5-fsim/build/tests/queens/queens.elf:     формат файла elf32-littleriscv
 
 
-Disassembly of section .text:
+Дизассемблирование раздела .text:
 
 00010074 <_start>:
    10074:	00002197          	auipc	gp,0x2
@@ -100,9 +100,9 @@ Disassembly of section .text:
    101b4:	04c0006f          	j	10200 <isSafe+0x68>
    101b8:	fd842703          	lw	a4,-40(s0)
    101bc:	00070793          	mv	a5,a4
-   101c0:	00479793          	slli	a5,a5,0x4
-   101c4:	40e787b3          	sub	a5,a5,a4
-   101c8:	00279793          	slli	a5,a5,0x2
+   101c0:	00379793          	slli	a5,a5,0x3
+   101c4:	00e787b3          	add	a5,a5,a4
+   101c8:	00379793          	slli	a5,a5,0x3
    101cc:	00078713          	mv	a4,a5
    101d0:	fdc42783          	lw	a5,-36(s0)
    101d4:	00e78733          	add	a4,a5,a4
@@ -126,9 +126,9 @@ Disassembly of section .text:
    1021c:	0580006f          	j	10274 <isSafe+0xdc>
    10220:	fec42703          	lw	a4,-20(s0)
    10224:	00070793          	mv	a5,a4
-   10228:	00479793          	slli	a5,a5,0x4
-   1022c:	40e787b3          	sub	a5,a5,a4
-   10230:	00279793          	slli	a5,a5,0x2
+   10228:	00379793          	slli	a5,a5,0x3
+   1022c:	00e787b3          	add	a5,a5,a4
+   10230:	00379793          	slli	a5,a5,0x3
    10234:	00078713          	mv	a4,a5
    10238:	fdc42783          	lw	a5,-36(s0)
    1023c:	00e78733          	add	a4,a5,a4
@@ -156,9 +156,9 @@ Disassembly of section .text:
    10294:	0580006f          	j	102ec <isSafe+0x154>
    10298:	fec42703          	lw	a4,-20(s0)
    1029c:	00070793          	mv	a5,a4
-   102a0:	00479793          	slli	a5,a5,0x4
-   102a4:	40e787b3          	sub	a5,a5,a4
-   102a8:	00279793          	slli	a5,a5,0x2
+   102a0:	00379793          	slli	a5,a5,0x3
+   102a4:	00e787b3          	add	a5,a5,a4
+   102a8:	00379793          	slli	a5,a5,0x3
    102ac:	00078713          	mv	a4,a5
    102b0:	fdc42783          	lw	a5,-36(s0)
    102b4:	00e78733          	add	a4,a5,a4
@@ -178,7 +178,7 @@ Disassembly of section .text:
    102ec:	fe842783          	lw	a5,-24(s0)
    102f0:	0007c863          	bltz	a5,10300 <isSafe+0x168>
    102f4:	fec42703          	lw	a4,-20(s0)
-   102f8:	00e00793          	li	a5,14
+   102f8:	01100793          	li	a5,17
    102fc:	f8e7dee3          	bge	a5,a4,10298 <isSafe+0x100>
    10300:	00100793          	li	a5,1
    10304:	00078513          	mv	a0,a5
@@ -194,7 +194,7 @@ Disassembly of section .text:
    10324:	fca42e23          	sw	a0,-36(s0)
    10328:	fcb42c23          	sw	a1,-40(s0)
    1032c:	fd842703          	lw	a4,-40(s0)
-   10330:	00e00793          	li	a5,14
+   10330:	01100793          	li	a5,17
    10334:	00e7d663          	bge	a5,a4,10340 <solveNQUtil+0x2c>
    10338:	00100793          	li	a5,1
    1033c:	0c80006f          	j	10404 <solveNQUtil+0xf0>
@@ -208,9 +208,9 @@ Disassembly of section .text:
    1035c:	08078663          	beqz	a5,103e8 <solveNQUtil+0xd4>
    10360:	fec42703          	lw	a4,-20(s0)
    10364:	00070793          	mv	a5,a4
-   10368:	00479793          	slli	a5,a5,0x4
-   1036c:	40e787b3          	sub	a5,a5,a4
-   10370:	00279793          	slli	a5,a5,0x2
+   10368:	00379793          	slli	a5,a5,0x3
+   1036c:	00e787b3          	add	a5,a5,a4
+   10370:	00379793          	slli	a5,a5,0x3
    10374:	00078713          	mv	a4,a5
    10378:	fdc42783          	lw	a5,-36(s0)
    1037c:	00e78733          	add	a4,a5,a4
@@ -230,9 +230,9 @@ Disassembly of section .text:
    103b4:	0500006f          	j	10404 <solveNQUtil+0xf0>
    103b8:	fec42703          	lw	a4,-20(s0)
    103bc:	00070793          	mv	a5,a4
-   103c0:	00479793          	slli	a5,a5,0x4
-   103c4:	40e787b3          	sub	a5,a5,a4
-   103c8:	00279793          	slli	a5,a5,0x2
+   103c0:	00379793          	slli	a5,a5,0x3
+   103c4:	00e787b3          	add	a5,a5,a4
+   103c8:	00379793          	slli	a5,a5,0x3
    103cc:	00078713          	mv	a4,a5
    103d0:	fdc42783          	lw	a5,-36(s0)
    103d4:	00e78733          	add	a4,a5,a4
@@ -244,7 +244,7 @@ Disassembly of section .text:
    103ec:	00178793          	addi	a5,a5,1
    103f0:	fef42623          	sw	a5,-20(s0)
    103f4:	fec42703          	lw	a4,-20(s0)
-   103f8:	00e00793          	li	a5,14
+   103f8:	01100793          	li	a5,17
    103fc:	f4e7d6e3          	bge	a5,a4,10348 <solveNQUtil+0x34>
    10400:	00000793          	li	a5,0
    10404:	00078513          	mv	a0,a5
@@ -254,17 +254,17 @@ Disassembly of section .text:
    10414:	00008067          	ret
 
 00010418 <solveNQ>:
-   10418:	c6010113          	addi	sp,sp,-928
-   1041c:	38112e23          	sw	ra,924(sp)
-   10420:	38812c23          	sw	s0,920(sp)
-   10424:	3a010413          	addi	s0,sp,928
-   10428:	c6c40793          	addi	a5,s0,-916
-   1042c:	38400713          	li	a4,900
+   10418:	ae010113          	addi	sp,sp,-1312
+   1041c:	50112e23          	sw	ra,1308(sp)
+   10420:	50812c23          	sw	s0,1304(sp)
+   10424:	52010413          	addi	s0,sp,1312
+   10428:	ae040793          	addi	a5,s0,-1312
+   1042c:	51000713          	li	a4,1296
    10430:	00070613          	mv	a2,a4
    10434:	00000593          	li	a1,0
    10438:	00078513          	mv	a0,a5
    1043c:	1b0000ef          	jal	ra,105ec <memset>
-   10440:	c6c40793          	addi	a5,s0,-916
+   10440:	ae040793          	addi	a5,s0,-1312
    10444:	00000593          	li	a1,0
    10448:	00078513          	mv	a0,a5
    1044c:	ec9ff0ef          	jal	ra,10314 <solveNQUtil>
@@ -274,9 +274,9 @@ Disassembly of section .text:
    1045c:	0080006f          	j	10464 <solveNQ+0x4c>
    10460:	00100793          	li	a5,1
    10464:	00078513          	mv	a0,a5
-   10468:	39c12083          	lw	ra,924(sp)
-   1046c:	39812403          	lw	s0,920(sp)
-   10470:	3a010113          	addi	sp,sp,928
+   10468:	51c12083          	lw	ra,1308(sp)
+   1046c:	51812403          	lw	s0,1304(sp)
+   10470:	52010113          	addi	sp,sp,1312
    10474:	00008067          	ret
 
 00010478 <main>:
@@ -564,25 +564,25 @@ Disassembly of section .text:
    10894:	c301a503          	lw	a0,-976(gp) # 11cd8 <_impure_ptr>
    10898:	00008067          	ret
 
-Disassembly of section .eh_frame:
+Дизассемблирование раздела .eh_frame:
 
 0001189c <__FRAME_END__>:
    1189c:	0000                	unimp
 	...
 
-Disassembly of section .init_array:
+Дизассемблирование раздела .init_array:
 
 000118a0 <__frame_dummy_init_array_entry>:
    118a0:	0164                	addi	s1,sp,140
    118a2:	0001                	nop
 
-Disassembly of section .fini_array:
+Дизассемблирование раздела .fini_array:
 
 000118a4 <__do_global_dtors_aux_fini_array_entry>:
    118a4:	0110                	addi	a2,sp,128
    118a6:	0001                	nop
 
-Disassembly of section .data:
+Дизассемблирование раздела .data:
 
 000118a8 <__DATA_BEGIN__>:
    118a8:	0000                	unimp
@@ -607,7 +607,7 @@ Disassembly of section .data:
    11964:	0000000b          	0xb
 	...
 
-Disassembly of section .sdata:
+Дизассемблирование раздела .sdata:
 
 00011cd0 <_global_impure_ptr>:
    11cd0:	18a8                	addi	a0,sp,120
@@ -621,7 +621,7 @@ Disassembly of section .sdata:
    11cd8:	18a8                	addi	a0,sp,120
    11cda:	0001                	nop
 
-Disassembly of section .bss:
+Дизассемблирование раздела .bss:
 
 00011cdc <__bss_start>:
    11cdc:	0000                	unimp
@@ -630,7 +630,7 @@ Disassembly of section .bss:
 00011ce0 <object.5435>:
 	...
 
-Disassembly of section .comment:
+Дизассемблирование раздела .comment:
 
 00000000 <.comment>:
    0:	3a434347          	fmsub.d	ft6,ft6,ft4,ft7,rmm
@@ -639,23 +639,4 @@ Disassembly of section .comment:
    a:	3820                	fld	fs0,112(s0)
    c:	322e                	fld	ft4,232(sp)
    e:	302e                	fld	ft0,232(sp)
-	...
-
-Disassembly of section .riscv.attributes:
-
-00000000 <.riscv.attributes>:
-   0:	1e41                	addi	t3,t3,-16
-   2:	0000                	unimp
-   4:	7200                	flw	fs0,32(a2)
-   6:	7369                	lui	t1,0xffffa
-   8:	01007663          	bgeu	zero,a6,14 <_start-0x10060>
-   c:	0014                	0x14
-   e:	0000                	unimp
-  10:	7205                	lui	tp,0xfffe1
-  12:	3376                	fld	ft6,376(sp)
-  14:	6932                	flw	fs2,12(sp)
-  16:	7032                	flw	ft0,44(sp)
-  18:	5f30                	lw	a2,120(a4)
-  1a:	326d                	jal	fffff9c4 <__global_pointer$+0xfffed91c>
-  1c:	3070                	fld	fa2,224(s0)
 	...

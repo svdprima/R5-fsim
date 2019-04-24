@@ -21,7 +21,7 @@ public:
 class Sim
 {
 private:
-    SimpleCache<uint32_t, BasicBlock> InstrCache;
+    SimpleCache<BasicBlock> InstrCache;
     HartState hart_state;
     Decoder DCD;
 public:

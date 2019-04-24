@@ -7,13 +7,16 @@ Instruction Decoder::Decode (uint32_t raw_instr)
     int cur_oppc = 0b1111111 & raw_instr;
     int cur_funct3 = 0; 
     int cur_funct7 = 0; 
-    //printf ("Raw instruction is: %08x\n", raw_instr);
+    uint32_t cur_rd = (0b111110000000 & raw_instr) >> 7;
    
     //RV32IM Instruction Set is currently supported
     if ((0b0010100 & cur_oppc) == 0b0010100)
     {
         dec_instr.type = InstrType::UType; 
-        dec_instr.SetRd((0b111110000000 & raw_instr) >> 7);
+        if (cur_rd == 0)
+            dec_instr.SetRd(32);
+        else
+            dec_instr.SetRd(cur_rd);
         dec_instr.SetImm((0b11111111111111111111000000000000 & raw_instr) >> 12);
         if (dec_instr.GetImm() & 0b10000000000000000000)
             dec_instr.SetImm(dec_instr.GetImm() | 0b11111111111100000000000000000000);
@@ -21,7 +24,10 @@ Instruction Decoder::Decode (uint32_t raw_instr)
     else if (cur_oppc == 0b1101111)
     {
         dec_instr.type = InstrType::JType;
-        dec_instr.SetRd((0b111110000000 & raw_instr) >> 7);
+        if (cur_rd == 0)
+            dec_instr.SetRd(32);
+        else
+            dec_instr.SetRd(cur_rd);
         dec_instr.SetImm((0b1111111111000000000000000000000 & raw_instr) >> 21);
         dec_instr.SetImm(dec_instr.GetImm() | (0b100000000000000000000 & raw_instr) >> 10);
         dec_instr.SetImm(dec_instr.GetImm() | (0b11111111000000000000 & raw_instr) >> 1);
@@ -33,7 +39,10 @@ Instruction Decoder::Decode (uint32_t raw_instr)
     else if (cur_oppc == 0b0110011)
     {
         dec_instr.type  = InstrType::RType;
-        dec_instr.SetRd((0b111110000000 & raw_instr) >> 7);
+        if (cur_rd == 0)
+            dec_instr.SetRd(32);
+        else
+            dec_instr.SetRd(cur_rd);
         cur_funct3 = (0b111000000000000 & raw_instr) >> 12;
         dec_instr.SetRs1((0b11111000000000000000 & raw_instr) >> 15);
         dec_instr.SetRs2((0b1111100000000000000000000 & raw_instr) >> 20);
@@ -44,7 +53,10 @@ Instruction Decoder::Decode (uint32_t raw_instr)
              cur_oppc == 0b1110011 || cur_oppc == 0b1100111)
     {
         dec_instr.type  = InstrType::IType;
-        dec_instr.SetRd((0b111110000000 & raw_instr) >> 7);
+        if (cur_rd == 0)
+            dec_instr.SetRd(32);
+        else
+            dec_instr.SetRd(cur_rd);
         cur_funct3 = (0b111000000000000 & raw_instr) >> 12;
         dec_instr.SetRs1((0b11111000000000000000 & raw_instr) >> 15);
         dec_instr.SetImm((0b11111111111100000000000000000000 & raw_instr) >> 20);

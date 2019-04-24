@@ -1,7 +1,6 @@
 #include "mmu.h"
 
-MMU::MMU(std::vector<uint32_t> &words, uint32_t n_pages) 
-: R_TLB(64), W_TLB(64), X_TLB(64)
+MMU::MMU(std::vector<uint32_t> &words, uint32_t n_pages)
 {
 	max_pa = n_pages*PAGESIZE;
 	if(words.size()*sizeof(uint32_t) > max_pa)

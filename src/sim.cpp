@@ -23,11 +23,6 @@ void Sim::Execute ()
                 BB = &BB_new;
             }
             BB->ExecuteBlock (hart_state);
-            if (hart_state.GetCmdCount() >= MAX_INSTR)
-            {
-                printf ("Maximum number of instructions has been reached!\n");
-                break;
-            }
         }
     }
     catch (FinishException &exc)
@@ -86,33 +81,6 @@ BasicBlock::BasicBlock (HartState &h_state, Decoder &DCD) noexcept
     }
     while ((i < block_size) && instructions[i - 1].GetBBEnd());
     instructions[i].SetCommand("BASIC", &BASICDUMMY);
-    auto j = instructions.begin();
-    while ((j + 1)->GetCmd() != &BASICDUMMY && (j + 2)->GetCmd() != &BASICDUMMY && !(j + 2)->GetCmd())
-    {
-        if (j->GetCmd() == &ADDIExec && (j + 1)->GetCmd() == &SWExec && !(j + 2)->GetBBEnd())
-        {
-            j->SetRd_2((j + 1)->GetRd());
-            j->SetRs1_2((j + 1)->GetRs1());
-            j->SetImm_2((j + 1)->GetImm());
-
-            j->SetRd_3((j + 2)->GetRd());
-            j->SetRs1_3((j + 2)->GetRs1());
-            j->SetImm_3((j + 2)->GetImm());
-            j->SetCommand("ADDISWLW", &ADDISWLWExec);
-        }
-        else if (j->GetCmd() == &SLLIExec && (j + 1)->GetCmd() == &ADDExec && (j + 2)->GetCmd() == &LWExec)
-        {
-            j->SetRd_2((j + 1)->GetRd());
-            j->SetRs1_2((j + 1)->GetRs1());
-            j->SetRs2_2((j + 1)->GetRs2());
-
-            j->SetRd_3((j + 2)->GetRd());
-            j->SetRs1_3((j + 2)->GetRs1());
-            j->SetRs2_3((j + 2)->GetRs2());
-            j->SetCommand("SLLIADDLW", &SLLIADDLWExec);
-        }
-        j++;
-    }
 }
 
 inline void BasicBlock::ExecuteBlock (HartState& h_state)

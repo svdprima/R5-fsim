@@ -22,7 +22,7 @@ LIBS = -lelf
 
 
 
-run: build_src build_test
+run:
 	@$(BUILD_SRC)/simulator $(BUILD_TEST)/$(TEST).elf
 
 
