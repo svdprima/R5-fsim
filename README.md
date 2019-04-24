@@ -9,7 +9,19 @@ make build_src
 ```
 and launch  
 ```console
-./build/src/simulator ./build/tests/<test_name>/<test_name>.elf
+make TEST=<your_test_name>
+```
+RISC-V GNU toolchain is required to compile new tests. After setting the toolchain, place the source code to 
+```console
+tests/<your_test_name>.c  
+```
+and set the PATH variable
+```console
+. set_env.sh
+```
+To compile the test type
+```console
+make TEST=<your_test_name> build_test 
 ```
 There is also a python script which runs the simulator n times and calculates the mean MIPS and standard deviation
 ```console
@@ -20,19 +32,3 @@ or
 python run.py <n> -v
 ```
 to print MIPS metric for every run.  
-RISC-V GNU toolchain is required to compile new tests. After setting the toolchain, place the source code to 
-```console
-tests/<your_test_name>.c  
-```
-and set the PATH variable
-```console
-. set_env.sh
-```
-To compile the test, the source code and launch the simulator, type
-```console
-make TEST=<your_test_name> 
-```
-To compile and run the test, launch
-```console
-make TEST=<your_test_name> build_test 
-```
